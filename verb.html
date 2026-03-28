@@ -604,8 +604,8 @@ function setLang(l){
   <a href="/contact.html" style="color:var(--txM)">Contact</a>
 </footer>
 
-<script src="./js/data.js"></script>
-<script src="./js/core.js"></script>
+<script src="./data.js"></script>
+<script src="./core.js"></script>
 <script>
 // Stand-alone page: expose globals needed by core.js
 curMod = 'verb';
@@ -627,9 +627,8 @@ function openM(id) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var c = document.getElementById('module-container');
+  var c = document.getElementById('m-verb');
   if (c) {
-    c.id = 'm-verb';
     initM(c, 'verb');
   }
   if (typeof updateRankWidget === 'function') updateRankWidget();
