@@ -2851,10 +2851,17 @@ function initM(c,id){
         {label:T('tQuiz'),type:'quiz',init:cc=>{
           const QF=[{l:T('f_te'),i:6},{l:T('f_nai'),i:3},{l:T('f_ta'),i:4},{l:T('f_dict'),i:2},{l:T('f_ukemiK'),i:10},{l:T('f_kanouK'),i:13}];
           let vqf=QF[0];
-          // optFnはqFnより先に呼ばれるため、ここでvqfを決定して両方で共有する
+          // optFnでvqfを決定し、qFnはvqfを読むだけ（変更しない）
           mkQ(cc,ds,T('secVerb'),'🔄',
-            i=>{return`<div class="qb"><div class="qT">${vqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`},
-            (i,all)=>{vqf=QF[Math.floor(Math.random()*QF.length)];const w=pick(all.filter(v=>v[vqf.i]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[vqf.i]),ci:o.indexOf(i)}},10,'verb')}}
+            i=>`<div class="qb"><div class="qT">${vqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`,
+            (i,all)=>{
+              vqf=QF[Math.floor(Math.random()*QF.length)];
+              const correct=i[vqf.i];
+              // 同じ動詞の他の活用形を選択肢にする
+              const others=shuf(QF.filter(f=>f!==vqf&&i[f.i]&&i[f.i]!==correct).map(f=>i[f.i])).slice(0,3);
+              const o=shuf([correct,...others]);
+              return{opts:o,ci:o.indexOf(correct)};
+            },10,'verb')}}
       ]);break;}
 
     case 'adj':{
@@ -2870,8 +2877,15 @@ function initM(c,id){
         {label:T('tQuiz'),type:'quiz',init:cc=>{
           const AQF=[{l:T('f_hitei'),i:2},{l:T('f_kako'),i:3},{l:T('f_kakohitei'),i:4},{l:T('f_te'),i:5}];let aqf=AQF[0];
           mkQ(cc,ds,T('secAdj'),'📝',
-            i=>{aqf=AQF[Math.floor(Math.random()*AQF.length)];return`<div class="qb"><div class="qT">${aqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`},
-            (i,all)=>{const w=pick(all.filter(v=>v[aqf.i]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[aqf.i]),ci:o.indexOf(i)}},10,'adj')}}
+            i=>`<div class="qb"><div class="qT">${aqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`,
+            (i,all)=>{
+              aqf=AQF[Math.floor(Math.random()*AQF.length)];
+              const correct=i[aqf.i];
+              // 同じ形容詞の他の変形を選択肢にする
+              const others=shuf(AQF.filter(f=>f!==aqf&&i[f.i]&&i[f.i]!==correct).map(f=>i[f.i])).slice(0,3);
+              const o=shuf([correct,...others]);
+              return{opts:o,ci:o.indexOf(correct)};
+            },10,'adj')}}
       ]);break;}
 
     case 'timenum':{
