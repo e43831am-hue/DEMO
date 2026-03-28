@@ -2851,9 +2851,10 @@ function initM(c,id){
         {label:T('tQuiz'),type:'quiz',init:cc=>{
           const QF=[{l:T('f_te'),i:6},{l:T('f_nai'),i:3},{l:T('f_ta'),i:4},{l:T('f_dict'),i:2},{l:T('f_ukemiK'),i:10},{l:T('f_kanouK'),i:13}];
           let vqf=QF[0];
+          // optFnはqFnより先に呼ばれるため、ここでvqfを決定して両方で共有する
           mkQ(cc,ds,T('secVerb'),'🔄',
-            i=>{vqf=QF[Math.floor(Math.random()*QF.length)];return`<div class="qb"><div class="qT">${vqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`},
-            (i,all)=>{const w=pick(all.filter(v=>v[vqf.i]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[vqf.i]),ci:o.indexOf(i)}},10,'verb')}}
+            i=>{return`<div class="qb"><div class="qT">${vqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`},
+            (i,all)=>{vqf=QF[Math.floor(Math.random()*QF.length)];const w=pick(all.filter(v=>v[vqf.i]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[vqf.i]),ci:o.indexOf(i)}},10,'verb')}}
       ]);break;}
 
     case 'adj':{
