@@ -2965,7 +2965,6 @@ function openArticle(url){
 
 function renderArticlesList(c){
   const ARTICLES=[
-    {url:'kana-practice.html', icon:'あア', title:'Kana Guide',         ja:'ひらがな・カタカナ一覧と覚え方',  tag:'Stage 0',  color:'linear-gradient(135deg,#E4572E,#C94120)',  desc:'Complete hiragana & katakana tables, confusing pairs, memorisation tricks, and a 2-week study plan.'},
     {url:'roadmap.html',       icon:'🗺',   title:'Learning Roadmap',   ja:'N5 → N4 → N3 → 日本就職',       tag:'Planning', color:'linear-gradient(135deg,#D4A017,#E4572E)',  desc:'Complete study roadmap from zero to JLPT N3 — the level that opens real job opportunities in Japan.'},
     {url:'guide.html',         icon:'📖',   title:'How to Use the App', ja:'クイズ・電工モジュールの使い方',  tag:'Guide',    color:'linear-gradient(135deg,#6BA368,#0891B2)',  desc:'Step-by-step guide to every module including the Electrical Worker specialist course and JLPT mock tests.'},
   ];
