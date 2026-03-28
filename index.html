@@ -95,7 +95,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;
 .sec-t::after{content:'';flex:1;height:1px;background:var(--brd)}
 .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .cd{background:var(--s1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 14px;
-  cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+  cursor:pointer;transition:all .22s;position:relative;overflow:hidden;display:block}
 .cd:hover{transform:translateY(-3px);border-color:var(--acc);box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .cd:active{transform:translateY(-1px)}
 .cd::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:.8}
@@ -659,20 +659,20 @@ function setLang(l){
   </div>
 
   <div class="cg">
-    <div class="cd c1" href="/kana-practice.html" onclick="event.preventDefault();openM('kana')"><span class="cd-i">あ</span><div class="cd-n"><script>document.write(T('secKana'))</script></div><div class="cd-d"><script>document.write(T('cdKana'))</script></div></div>
-    <div class="cd c2" href="/vocab.html" onclick="event.preventDefault();openM('vocab')"><span class="cd-i">📖</span><div class="cd-n"><script>document.write(T('secVoc'))</script></div><div class="cd-d"><script>document.write(T('cdVoc'))</script></div><div class="cd-count">2,404+1,448</div></div>
-    <div class="cd c3" href="/kanji.html" onclick="event.preventDefault();openM('kanji')"><span class="cd-i">🈶</span><div class="cd-n"><script>document.write(T('secKan'))</script></div><div class="cd-d"><script>document.write(T('cdKan'))</script></div><div class="cd-count">374+367</div></div>
-    <div class="cd c4" href="/verb.html" onclick="event.preventDefault();openM('verb')"><span class="cd-i">🔄</span><div class="cd-n"><script>document.write(T('secVerb'))</script></div><div class="cd-d"><script>document.write(T('cdVerb'))</script></div><div class="cd-count">408</div></div>
-    <div class="cd c5" href="/adj.html" onclick="event.preventDefault();openM('adj')"><span class="cd-i">📝</span><div class="cd-n"><script>document.write(T('secAdj'))</script></div><div class="cd-d"><script>document.write(T('cdAdj'))</script></div><div class="cd-count">70</div></div>
-    <div class="cd c1" href="/timenum.html" onclick="event.preventDefault();openM('timenum')"><span class="cd-i">🕐</span><div class="cd-n"><script>document.write(T('secTime'))</script></div><div class="cd-d"><script>document.write(T('cdTime'))</script></div></div>
-    <div class="cd c2" href="/grammar.html" onclick="event.preventDefault();openM('grammar')"><span class="cd-i">📗</span><div class="cd-n"><script>document.write(T('secGram'))</script></div><div class="cd-d"><script>document.write(T('cdGram'))</script></div><div class="cd-count">26+18</div></div>
+    <a class="cd c1" href="kana-practice.html" style="text-decoration:none;color:inherit"><span class="cd-i">あ</span><div class="cd-n"><script>document.write(T('secKana'))</script></div><div class="cd-d"><script>document.write(T('cdKana'))</script></div></a>
+    <a class="cd c2" href="vocab.html" style="text-decoration:none;color:inherit"><span class="cd-i">📖</span><div class="cd-n"><script>document.write(T('secVoc'))</script></div><div class="cd-d"><script>document.write(T('cdVoc'))</script></div><div class="cd-count">2,404+1,448</div></a>
+    <a class="cd c3" href="kanji.html" style="text-decoration:none;color:inherit"><span class="cd-i">🈶</span><div class="cd-n"><script>document.write(T('secKan'))</script></div><div class="cd-d"><script>document.write(T('cdKan'))</script></div><div class="cd-count">374+367</div></a>
+    <a class="cd c4" href="verb.html" style="text-decoration:none;color:inherit"><span class="cd-i">🔄</span><div class="cd-n"><script>document.write(T('secVerb'))</script></div><div class="cd-d"><script>document.write(T('cdVerb'))</script></div><div class="cd-count">408</div></a>
+    <a class="cd c5" href="adj.html" style="text-decoration:none;color:inherit"><span class="cd-i">📝</span><div class="cd-n"><script>document.write(T('secAdj'))</script></div><div class="cd-d"><script>document.write(T('cdAdj'))</script></div><div class="cd-count">70</div></a>
+    <a class="cd c1" href="timenum.html" style="text-decoration:none;color:inherit"><span class="cd-i">🕐</span><div class="cd-n"><script>document.write(T('secTime'))</script></div><div class="cd-d"><script>document.write(T('cdTime'))</script></div></a>
+    <a class="cd c2" href="grammar.html" style="text-decoration:none;color:inherit"><span class="cd-i">📗</span><div class="cd-n"><script>document.write(T('secGram'))</script></div><div class="cd-d"><script>document.write(T('cdGram'))</script></div><div class="cd-count">26+18</div></a>
   </div>
 
   <div id="home-extras">
   <div class="sec-t"><script>document.write(T('specialSec'))</script></div>
   <div class="cg">
-    <div class="cd c1" href="/biz.html" onclick="event.preventDefault();openM('biz')" style="background:linear-gradient(135deg,var(--s1),rgba(228,87,46,0.06))"><span class="cd-i">💼</span><div class="cd-n">ビジネスマナー</div><div class="cd-d">○×クイズ 99問</div></div>
-    <div class="cd c5" href="/denkou.html" onclick="event.preventDefault();openM('denkou')" style="background:linear-gradient(135deg,var(--s1),rgba(107,163,104,0.06))"><span class="cd-i">⚡</span><div class="cd-n">電気工事士</div><div class="cd-d">電工漢字・専門用語</div></div>
+    <a class="cd c1" href="biz.html" style="text-decoration:none;color:inherit;background:linear-gradient(135deg,var(--s1),rgba(228,87,46,0.06))"><span class="cd-i">💼</span><div class="cd-n">ビジネスマナー</div><div class="cd-d">○×クイズ 99問</div></a>
+    <a class="cd c5" href="denkou.html" style="text-decoration:none;color:inherit;background:linear-gradient(135deg,var(--s1),rgba(107,163,104,0.06))"><span class="cd-i">⚡</span><div class="cd-n">電気工事士</div><div class="cd-d">電工漢字・専門用語</div></a>
   </div>
 
   <!-- ── 記事一覧ショートカット ── -->
@@ -704,20 +704,10 @@ function setLang(l){
 
 </div>
 
-<!-- Module containers -->
-<div class="mod" id="m-kana"></div>
-<div class="mod" id="m-vocab"></div>
-<div class="mod" id="m-kanji"></div>
-<div class="mod" id="m-verb"></div>
-<div class="mod" id="m-adj"></div>
-<div class="mod" id="m-timenum"></div>
-<div class="mod" id="m-grammar"></div>
-
-<div class="mod" id="m-biz"></div>
+<!-- SPA-only module containers (no individual pages) -->
 <div class="mod" id="m-dashboard"></div>
 <div class="mod" id="m-review"></div>
 <div class="mod" id="m-longterm"></div>
-<div class="mod" id="m-denkou"></div>
 <div class="mod" id="m-articles"></div>
 <script src="./data.js"></script>
 <script src="./core.js"></script>
