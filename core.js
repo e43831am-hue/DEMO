@@ -216,19 +216,15 @@ function mkK(c,base,daku,title,em){
           if(x.dataset.v===ch){x.style.border='2px solid var(--grn)';x.style.background='rgba(107,163,104,0.12)';}
         });
         const fb=document.getElementById('kfb');
-        const isOk=(o.dataset.v===ch);
-        if(isOk){sc.c++;addS();fb.className='qfb ok';fb.innerHTML=T('ok');o.style.border='2px solid var(--grn)';o.style.background='rgba(107,163,104,0.12)';}
+        if(o.dataset.v===ch){sc.c++;addS();fb.className='qfb ok';fb.innerHTML=T('ok');o.style.border='2px solid var(--grn)';o.style.background='rgba(107,163,104,0.12)';}
         else{o.style.border='2px solid var(--red)';o.style.background='rgba(217,107,107,0.12)';sc.w++;rstS();fb.className='qfb no';fb.innerHTML=T('no')+' → <b>'+ch+'</b>';}
-        if(typeof logQuizAnswer==='function') logQuizAnswer(data[order[pos]],opts.map(x=>x[0]),opts.indexOf(data[order[pos]]),opts.findIndex(x=>x[0]===o.dataset.v),isOk);
         const btn=document.getElementById('knx');btn.style.display='inline-block';
         btn.onclick=()=>{
           pos++;
           if(pos>=totalQ){
             // Show score
             const t=sc.c+sc.w,p=t?Math.round(sc.c/t*100):0;
-            let scoreHtml=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${['もっと頑張ろう！','いい感じ！','すごい！','完璧！'][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T("scoreCo")}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T("scoreWr")}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T("again")}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T("home")}</button></div>`;
-            c.innerHTML=scoreHtml;
-            if(typeof renderQuizResultDetails==='function'&&window._quizLog&&window._quizLog.length>0){const scrEl=c.querySelector('.scr');if(scrEl)renderQuizResultDetails(scrEl,window._quizLog,'kana');}
+            c.innerHTML=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${['もっと頑張ろう！','いい感じ！','すごい！','完璧！'][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T("scoreCo")}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T("scoreWr")}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T("again")}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T("home")}</button></div>`;
           } else {render();}
         };
       }})
@@ -381,13 +377,8 @@ function mkQ(c,datasets,title,em,qFn,optFn,max,modKey){
     if(pos>=order.length){
       pvPush('/quiz/'+mk+'/score','Score: '+mk.toUpperCase());
       let t=sc.c+sc.w,p=t?Math.round(sc.c/t*100):0;
-      let scoreHtml=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T('scoreCo')}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T('scoreWr')}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T('again')}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T('home')}</button></div>`;
-      target.innerHTML=scoreHtml;
-      // Append detailed quiz results if available
-      if(typeof renderQuizResultDetails==='function' && window._quizLog && window._quizLog.length>0){
-        const scrEl=target.querySelector('.scr');
-        if(scrEl) renderQuizResultDetails(scrEl, window._quizLog, mk);
-      }
+      target.innerHTML=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T('scoreCo')}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T('scoreWr')}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T('again')}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T('home')}</button></div>`;
+      if(typeof renderQuizResultDetails==='function'&&window._quizLog&&window._quizLog.length>0){const s=target.querySelector('.scr');if(s)renderQuizResultDetails(s,window._quizLog);}
       setTimeout(()=>maybeShowReviewPopup(),500);
       return;
     }
@@ -416,10 +407,8 @@ function mkQ(c,datasets,title,em,qFn,optFn,max,modKey){
     h+=`</div><div style="text-align:center"><button class="tts" onclick="speak('${spkText.replace(/'/g,"\'")}')">${T('speak')}</button></div>`;
     target.innerHTML=h;
 
-    // Start per-question timer
-    if(typeof startQuizTimer==='function') startQuizTimer();
-    
     // Attach click handlers — opts/ci captured in closure, no DOM parsing
+    if(typeof startQuizTimer==='function')startQuizTimer();
     target.querySelectorAll('.qo').forEach(o=>{
       o.onclick=function(){
         if(o.classList.contains('dis'))return;
@@ -428,8 +417,7 @@ function mkQ(c,datasets,title,em,qFn,optFn,max,modKey){
         const isOk=(chosen===_curCi);
         if(isOk){sc.c++;SRS.correct(mk,item);addS();}
         else{sc.w++;SRS.wrong(mk,item);rstS();}
-        // Log answer for detailed results
-        if(typeof logQuizAnswer==='function') logQuizAnswer(item,_curOpts,_curCi,chosen,isOk);
+        if(typeof logQuizAnswer==='function')logQuizAnswer(item,_curOpts,_curCi,chosen,isOk);
         showResult(item,_curOpts,_curCi,chosen,isOk);
       };
     });
@@ -440,7 +428,7 @@ function mkQ(c,datasets,title,em,qFn,optFn,max,modKey){
   function timeUp(){
     const item=cur[order[pos]];
     sc.w++;SRS.wrong(mk,item);rstS();
-    if(typeof logQuizAnswer==='function') logQuizAnswer(item,_curOpts,_curCi,-1,false);
+    if(typeof logQuizAnswer==='function')logQuizAnswer(item,_curOpts,_curCi,-1,false);
     showResult(item,_curOpts,_curCi,-1,false);
   }
 
@@ -2950,15 +2938,14 @@ function initM(c,id){
       break;}
       
     case 'dashboard':{
-      mkDashboard(c);
+      if(typeof mkDashboard==='function')mkDashboard(c);
       break;}
       
-    case 'longterm':{
-      mkLongTerm(c);
-      break;}
-      
-    case 'review':{
-      mkReview(c);
+    case 'longterm':
+    case 'review':
+    case 'revenge':{
+      if(typeof mkRevenge==='function')mkRevenge(c);
+      else c.innerHTML='<div style="padding:40px;text-align:center;color:var(--txM)">Loading...</div>';
       break;}
       
     case 'denkou':{
