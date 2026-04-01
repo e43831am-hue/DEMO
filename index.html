@@ -534,6 +534,7 @@ function setLang(l){
   if(curMod){
     const c=document.getElementById('m-'+curMod);
     if(c){c.innerHTML='';initM(c,curMod);}
+  if(typeof _nwUpdatePageText==='function') _nwUpdatePageText();
   } else {
     // On home page: reload to apply translations to static script tags
     location.reload();

@@ -537,6 +537,7 @@ const L={
   dkNextQ:{ja:'次へ →',en:'Next →',bn:'পরবর্তী →'},
   dkAllCards:{ja:'全て',en:'All',bn:'সব'},
   adv:{ja:'🔒 上級 (N3)',en:'🔒 Advanced (N3)',bn:'🔒 উন্নত (N3)'},
+  otherModules:{ja:'他のモジュール',en:'Other Modules',bn:'অন্যান্য মডিউল'},
 
   // ── Batch/Set UI strings ──
   batchSet:{ja:'セット',en:'Set',bn:'সেট'},
@@ -623,7 +624,7 @@ function T(k){return (L[k]&&L[k][_lang])||L[k]?.ja||k}
     <button class="lb" onclick="setLang('bn')" id="lb-bn">🇧🇩</button>
   </div>
   <div class="top-r">
-    <a href="index.html" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);text-decoration:none;display:flex;align-items:center;gap:4px">🏠 ホーム</a>
+    <a href="index.html" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);text-decoration:none;display:flex;align-items:center;gap:4px" data-t="homeBtnLbl">🏠 ホーム</a>
   </div>
 </div>
 
@@ -646,7 +647,7 @@ function T(k){return (L[k]&&L[k][_lang])||L[k]?.ja||k}
 
 
 <nav style="max-width:720px;margin:0 auto;padding:20px 16px 40px;border-top:1px solid var(--brd)">
-  <div style="font-size:12px;font-weight:700;color:var(--txM);margin-bottom:12px">Other Modules — 他のモジュール</div>
+  <div style="font-size:12px;font-weight:700;color:var(--txM);margin-bottom:12px" data-t="otherModules">Other Modules — 他のモジュール</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
 <a href="vocab.html" style="display:block;background:var(--s1);border:1px solid var(--brd);border-radius:12px;padding:12px 10px;text-align:center;text-decoration:none;color:var(--tx);font-size:12px;font-weight:600;transition:all .2s">📖<br>Vocabulary</a>
 <a href="kanji.html" style="display:block;background:var(--s1);border:1px solid var(--brd);border-radius:12px;padding:12px 10px;text-align:center;text-decoration:none;color:var(--tx);font-size:12px;font-weight:600;transition:all .2s">🈶<br>Kanji</a>
@@ -692,7 +693,7 @@ function openM(id) {
 document.addEventListener('DOMContentLoaded', function() {
   var c = document.getElementById('m-verb');
   if (c) {
-    initM(c, 'verb');
+    if(typeof initM==='function') initM(c, 'verb');
   }
   if (typeof updateRankWidget === 'function') updateRankWidget();
 });
@@ -704,7 +705,12 @@ window.setLang = function(l) {
     var b = document.getElementById('lb-'+lg);
     if (b) b.classList.toggle('on', lg === l);
   });
-  var modId='verb';var c=document.getElementById('m-'+modId);if(c){c.innerHTML='';initM(c,modId);}
+  var modId='verb';var c=document.getElementById('m-'+modId);
+  if(c){
+    c.innerHTML='';
+    if(typeof initM==='function') initM(c, modId);
+  }
+  if(typeof _nwUpdatePageText==='function') _nwUpdatePageText();
 };
 // Apply saved language on load
 (function() {

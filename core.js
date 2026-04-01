@@ -16,6 +16,17 @@ function speak(text){
 }
 function ttsBtn(text,size){return `<button class="tts" onclick="event.stopPropagation();speak('${text.replace(/'/g,"\\'")}')">${T('speak')}</button>`}
 
+// ── Global view-state for language-switch preservation ──
+window._nwViewState = window._nwViewState || {};
+function _nwSaveState(modKey, view, batchIdx, extras) {
+  window._nwViewState[modKey] = {view: view, batchIdx: batchIdx || 0, extras: extras || {}};
+}
+function _nwGetState(modKey) {
+  var s = window._nwViewState[modKey];
+  if (s) { delete window._nwViewState[modKey]; return s; }
+  return null;
+}
+
 // ── SRS (Spaced Repetition Tracking) ──
 
 // ── Review Popup (記憶定着率アップ) ──
@@ -174,7 +185,7 @@ function mkK(c,base,daku,title,em){
   function filts(){return `<div class="flts"><button class="fb ${filt==='base'?'on':''}" onclick="${sid}_F('base')">基本(${base.length})</button><button class="fb ${filt==='daku'?'on':''}" onclick="${sid}_F('daku')">濁音(${daku.length})</button><button class="fb ${filt==='all'?'on':''}" onclick="${sid}_F('all')">全部(${base.length+daku.length})</button></div>`}
   function render(){
     if(mode==='grid'){let h=`<div class="mod-h"><div class="mod-t">${em} ${title}</div></div>`+tabs('grid')+filts()+`<div class="kgrid">`;data.forEach(([ch,r])=>h+=`<div class="kcell"><div class="kch">${ch}</div><div class="kro">${r}</div></div>`);c.innerHTML=h+`</div>`;return}
-    if(pos>=order.length){let t=sc.c+sc.w,p=t?Math.round(sc.c/t*100):0;if(typeof trackPV==='function')trackPV('/quiz/kana/score','Kana Score');c.innerHTML=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${['もっと頑張ろう！','いい感じ！','すごい！','完璧！'][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T("scoreCo")}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T("scoreWr")}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T("again")}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T("home")}</button></div>`;return}
+    if(pos>=order.length){let t=sc.c+sc.w,p=t?Math.round(sc.c/t*100):0;if(typeof trackPV==='function')trackPV('/quiz/kana/score','Kana Score');c.innerHTML=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T("scoreCo")}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T("scoreWr")}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T("again")}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T("home")}</button></div>`;return}
     const [ch,rom]=data[order[pos]],pct=pos/order.length*100;
     if(typeof trackPV==='function')trackPV('/quiz/kana/'+filt+'/'+(pos+1),'Kana Q'+(pos+1));
     if(mode==='type'){
@@ -224,7 +235,7 @@ function mkK(c,base,daku,title,em){
           if(pos>=totalQ){
             // Show score
             const t=sc.c+sc.w,p=t?Math.round(sc.c/t*100):0;
-            c.innerHTML=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${['もっと頑張ろう！','いい感じ！','すごい！','完璧！'][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T("scoreCo")}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T("scoreWr")}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T("again")}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T("home")}</button></div>`;
+            c.innerHTML=`<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T("scoreCo")}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T("scoreWr")}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="openM('${curMod}')">${T("again")}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T("home")}</button></div>`;
           } else {render();}
         };
       }})
@@ -1273,7 +1284,7 @@ function mkBizOX(c) {
           SRS.correct(mk, q);
           fb.style.display = 'block';
           fb.className = 'qfb ok';
-          fb.innerHTML = '✓ 正解！';
+          fb.innerHTML = T('ok');
           this.style.borderColor = 'var(--grn)';
         } else {
           sc.w++;
@@ -1281,7 +1292,7 @@ function mkBizOX(c) {
           SRS.wrong(mk, q);
           fb.style.display = 'block';
           fb.className = 'qfb no';
-          fb.innerHTML = `正解は ${q.a ? '○ 正しい' : '× 間違い'}です`;
+          fb.innerHTML = T('no') + ' → ' + (q.a ? '○' : '×');
           this.style.borderColor = 'var(--red)';
           this.style.background = 'rgba(217,107,107,0.2)';
         }
@@ -1445,7 +1456,7 @@ function mkReview(c) {
       const t = sc.c + sc.w;
       const p = t ? Math.round(sc.c / t * 100) : 0;
       if(typeof trackPV==='function')trackPV('/quiz/review/'+currentCat+'/score','Review Score');
-      target.innerHTML = `<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${T('wellDone')} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">正解</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">不正解</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="mkReview(document.getElementById('m-review'))" style="background:var(--acc);color:#fff">もう一度</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">ホーム</button></div>`;
+      target.innerHTML = `<div class="scr sh"><div class="scr-big">${p}%</div><div class="scr-msg">${T('wellDone')} (${sc.c}/${t})</div><div class="scr-tiles"><div class="scr-t g"><div class="tl">${T('scoreCo')}</div><div class="tv">${sc.c}</div></div><div class="scr-t r"><div class="tl">${T('scoreWr')}</div><div class="tv">${sc.w}</div></div></div><button class="rbtn" onclick="mkReview(document.getElementById('m-review'))" style="background:var(--acc);color:#fff">${T('again')}</button><button class="rbtn" style="background:var(--s2);color:var(--tx)" onclick="goHome()">${T('home')}</button></div>`;
       setTimeout(()=>maybeShowReviewPopup(),500);
       return;
     }
@@ -1478,12 +1489,12 @@ function mkReview(c) {
           sc.c++; addS();
           SRS.correct('kana', item);
           fb.className = 'qfb ok';
-          fb.innerHTML = '✓ ' + ch + ' = ' + rom;
+          fb.innerHTML = T('ok') + ' ' + ch + ' = ' + rom;
         } else {
           sc.w++; rstS();
           SRS.wrong('kana', item);
           fb.className = 'qfb no';
-          fb.innerHTML = '× → <b>' + rom + '</b>';
+          fb.innerHTML = T('no') + ' → <b>' + rom + '</b>';
         }
         inp.disabled = true;
         document.getElementById('rev-nx').style.display = 'inline-block';
@@ -1566,14 +1577,14 @@ function mkReview(c) {
             addS();
             SRS.correct((currentCat.includes('kanji') ? 'kanji' : currentCat.includes('grammar') ? 'grammar' : 'vocab'), item);
             fb.className = 'qfb ok';
-            fb.innerHTML = '✓ 正解！';
+            fb.innerHTML = T('ok');
             this.style.borderColor = 'var(--grn)';
           } else {
             sc.w++;
             rstS();
             SRS.wrong((currentCat.includes('kanji') ? 'kanji' : currentCat.includes('grammar') ? 'grammar' : 'vocab'), item);
             fb.className = 'qfb no';
-            fb.innerHTML = `× 正解は「${meaning}」`;
+            fb.innerHTML = T('no') + ` → 「${meaning}」`;
             this.style.borderColor = 'var(--red)';
           }
           
@@ -1709,8 +1720,8 @@ function mkLongTerm(c) {
             document.querySelectorAll('.biz-btn').forEach(b=>b.dataset.answered='1');
             const ans=this.dataset.ans==='true';
             const fb=document.getElementById('lt-fb');
-            if(ans===q.a){sc.c++;addS();SRS.correct(cur.key,item);fb.className='qfb ok';fb.textContent='✓ 正解！ '+(q.a?'○ 正しい':'× 間違い');}
-            else{sc.w++;rstS();SRS.wrong(cur.key,item);fb.className='qfb no';fb.textContent='× 不正解。正解: '+(q.a?'○ 正しい':'× 間違い');}
+            if(ans===q.a){sc.c++;addS();SRS.correct(cur.key,item);fb.className='qfb ok';fb.textContent=T('ok')+' '+(q.a?'○':'×');}
+            else{sc.w++;rstS();SRS.wrong(cur.key,item);fb.className='qfb no';fb.textContent=T('no')+' → '+(q.a?'○':'×');}
             const nx=document.getElementById('lt-nx');nx.style.display='inline-block';nx.onclick=()=>{pos++;render();};
           };
         });
@@ -1720,7 +1731,7 @@ function mkLongTerm(c) {
         const others=shuf(cur.allData.filter(x=>x!==item)).slice(0,3);
         const opts=shuf([item,...others]);
         const ci=opts.indexOf(item);
-        h+=`<div class="qb"><div class="qT">${isGram?'文法：':'意味は？'}</div><div class="qB" style="font-size:${jp.length>4?'28px':'40px'}">${jp}</div></div>`;
+        h+=`<div class="qb"><div class="qT">${isGram?({ja:'文法：',en:'Grammar:',bn:'ব্যাকরণ:'}[_lang]||'文法：'):T('meaningQ')}</div><div class="qB" style="font-size:${jp.length>4?'28px':'40px'}">${jp}</div></div>`;
         h+='<div class="qos">';
         opts.forEach((opt,i)=>{h+=`<button class="qo" data-idx="${i}" data-correct="${i===ci}"><span class="ol">${String.fromCharCode(65+i)}</span>${opt[1]||''}</button>`;});
         h+=`</div><div class="qfb" id="lt-fb"></div><button class="qnx" id="lt-nx" style="display:none">${T('nextBtn')}</button>`;
@@ -1837,24 +1848,24 @@ function mkDashboard(c) {
   
   // Header with greeting
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'おはよう' : hour < 18 ? 'こんにちは' : 'お疲れ様';
+  const greeting = hour < 12 ? ({ja:'おはよう',en:'Good morning',bn:'সুপ্রভাত'}[_lang]||'おはよう') : hour < 18 ? ({ja:'こんにちは',en:'Good afternoon',bn:'শুভ বিকেল'}[_lang]||'こんにちは') : ({ja:'お疲れ様',en:'Good evening',bn:'শুভ সন্ধ্যা'}[_lang]||'お疲れ様');
   h += '<div style="text-align:center;padding:16px 0 20px">';
   h += '<div style="font-size:15px;color:var(--txM);margin-bottom:4px">' + greeting + '！</div>';
-  h += '<div style="font-family:\'Zen Maru Gothic\',sans-serif;font-size:22px;font-weight:900;color:var(--tx)">📊 マイダッシュボード</div>';
+  h += '<div style="font-family:\'Zen Maru Gothic\',sans-serif;font-size:22px;font-weight:900;color:var(--tx)">' + T('dashTitle') + '</div>';
   h += '</div>';
   
   // Top stats row with circular progress
   h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">';
   h += '<div style="background:var(--s1);border-radius:14px;padding:16px 8px;text-align:center;border:1px solid var(--brd)">';
-  h += circleProgress(overallRate, 90, overallRate >= 80 ? 'var(--grn)' : overallRate >= 60 ? '#D4A843' : 'var(--acc)', '正答率', allCorrect + '/' + allTotal);
+  h += circleProgress(overallRate, 90, overallRate >= 80 ? 'var(--grn)' : overallRate >= 60 ? '#D4A843' : 'var(--acc)', ({ja:'正答率',en:'Accuracy',bn:'সঠিক হার'}[_lang]||'正答率'), allCorrect + '/' + allTotal);
   h += '</div>';
   h += '<div style="background:var(--s1);border-radius:14px;padding:16px 8px;text-align:center;border:1px solid var(--brd)">';
-  h += circleProgress(masteryPercent, 90, 'var(--accB)', '習得率', allMastered + '/' + allItemCount);
+  h += circleProgress(masteryPercent, 90, 'var(--accB)', ({ja:'習得率',en:'Mastery',bn:'দক্ষতা'}[_lang]||'習得率'), allMastered + '/' + allItemCount);
   h += '</div>';
   h += '<div style="background:var(--s1);border-radius:14px;padding:16px 8px;text-align:center;border:1px solid var(--brd)">';
   h += '<div style="font-size:36px;margin-bottom:4px">🔥</div>';
   h += '<div style="font-size:24px;font-weight:900;color:var(--tx)">' + totalStreak + '</div>';
-  h += '<div style="font-size:11px;color:var(--txM);margin-top:4px">連続正解</div>';
+  h += '<div style="font-size:11px;color:var(--txM);margin-top:4px">' + ({ja:'連続正解',en:'Streak',bn:'ধারা'}[_lang]||'連続正解') + '</div>';
   h += '</div>';
   h += '</div>';
   
@@ -1862,8 +1873,8 @@ function mkDashboard(c) {
   if (allWeak > 0) {
     h += '<div onclick="openM(\'review\')" style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:12px;padding:14px 16px;margin-bottom:14px;cursor:pointer;border:1px solid #FFB74D;display:flex;align-items:center;gap:12px">';
     h += '<div style="font-size:28px">⚠️</div>';
-    h += '<div><div style="font-size:13px;font-weight:700;color:#E65100">苦手アイテム: ' + allWeak + '個</div>';
-    h += '<div style="font-size:11px;color:#BF360C;margin-top:2px">タップして復習クイズへ →</div></div>';
+    h += '<div><div style="font-size:13px;font-weight:700;color:#E65100">' + ({ja:'苦手アイテム: ',en:'Weak items: ',bn:'দুর্বল আইটেম: '}[_lang]||'苦手アイテム: ') + allWeak + ({ja:'個',en:'',bn:'টি'}[_lang]||'個') + '</div>';
+    h += '<div style="font-size:11px;color:#BF360C;margin-top:2px">' + ({ja:'タップして復習クイズへ →',en:'Tap to start review quiz →',bn:'রিভিউ কুইজ শুরু করতে ট্যাপ করুন →'}[_lang]||'タップして復習クイズへ →') + '</div></div>';
     h += '</div>';
   }
   
@@ -1917,10 +1928,10 @@ function mkDashboard(c) {
   
   // Action buttons
   h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-  h += '<button onclick="openM(\'review\')" style="padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--acc),#C53E1B);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📝 復習クイズ</button>';
-  h += '<button onclick="openM(\'longterm\')" style="padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--accB),#152D4D);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🧠 長期記憶テスト</button>';
+  h += '<button onclick="openM(\'review\')" style="padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--acc),#C53E1B);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">'+T('revTitle')+'</button>';
+  h += '<button onclick="openM(\'longterm\')" style="padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--accB),#152D4D);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">'+T('ltTitle')+'</button>';
   h += '</div>';
-  h += '<button onclick="goHome()" style="width:100%;padding:12px;border-radius:12px;background:var(--s2);color:var(--txM);border:1px solid var(--brd);font-size:13px;cursor:pointer;font-family:inherit">🏠 ホームに戻る</button>';
+  h += '<button onclick="goHome()" style="width:100%;padding:12px;border-radius:12px;background:var(--s2);color:var(--txM);border:1px solid var(--brd);font-size:13px;cursor:pointer;font-family:inherit">'+T('batchHomeBack')+'</button>';
   h += '</div>';
   
   target.innerHTML = h;
@@ -2748,7 +2759,7 @@ function mkDenkou(c) {
     h+=`<button class="dk-act prev" onclick="dkPrev_${sid}()">${T('dkPrev')}</button>`;
     h+=`<button class="dk-act flag ${isFl?'dk-flagged':''}" onclick="dkFlag_${sid}()">${isFl?T('dkReviewing'):T('dkMarkReview')}</button>`;
     if(dkView==='flash' && dkBatchItems.length>0 && cardPos>=dkBatchItems.length-1){
-      h+=`<button class="dk-act nxt" style="background:#6bbf8a;color:#000" onclick="dkBatchDone_${sid}()">✓ 完了！</button>`;
+      h+=`<button class="dk-act nxt" style="background:#6bbf8a;color:#000" onclick="dkBatchDone_${sid}()">${T('batchCompleteFlash')}</button>`;
     } else {
       h+=`<button class="dk-act nxt" onclick="dkNext_${sid}()">${T('dkNext')}</button>`;
     }
@@ -2762,7 +2773,7 @@ function mkDenkou(c) {
       if(typeof trackPV==='function')trackPV('/quiz/denkou-'+mode+'/score','電工 '+mode+' Score');
       const t=quizScore.c+quizScore.w,p=t?Math.round(quizScore.c/t*100):0;
       const nextBi=dkCurBatch+1;const bt2=dkCurType;const hasNext=dkView==='quiz'&&bt2&&nextBi<dkGetBatches(bt2.items).length;
-    area.innerHTML=`<div class="dk-scr"><div class="dk-scr-big">${p}%</div><div class="dk-scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${quizScore.c}/${t})</div><div class="dk-tiles"><div class="dk-tile g"><div class="tl">${T('scoreCo')}</div><div class="tv">${quizScore.c}</div></div><div class="dk-tile r"><div class="tl">${T('scoreWr')}</div><div class="tv">${quizScore.w}</div></div><div class="dk-tile"><div class="tl">Total</div><div class="tv">${t}</div></div></div><button class="dk-nx-btn" onclick="dkRestart_${sid}()" style="margin-right:10px">${T('dkTryAgain')}</button>${hasNext?`<button class="dk-nx-btn" onclick="dkOpenBatch_${sid}(${nextBi})" style="background:#6bbf8a;color:#000;margin-right:10px">次のセット →</button>`:''}<button class="dk-nx-btn" onclick="${sid}_bsR()" style="background:#1e2028;color:#e8e6df">← セット一覧</button></div>`;
+    area.innerHTML=`<div class="dk-scr"><div class="dk-scr-big">${p}%</div><div class="dk-scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${quizScore.c}/${t})</div><div class="dk-tiles"><div class="dk-tile g"><div class="tl">${T('scoreCo')}</div><div class="tv">${quizScore.c}</div></div><div class="dk-tile r"><div class="tl">${T('scoreWr')}</div><div class="tv">${quizScore.w}</div></div><div class="dk-tile"><div class="tl">Total</div><div class="tv">${t}</div></div></div><button class="dk-nx-btn" onclick="dkRestart_${sid}()" style="margin-right:10px">${T('dkTryAgain')}</button>${hasNext?`<button class="dk-nx-btn" onclick="dkOpenBatch_${sid}(${nextBi})" style="background:#6bbf8a;color:#000;margin-right:10px">${T('batchNextSet')}</button>`:''}<button class="dk-nx-btn" onclick="${sid}_bsR()" style="background:#1e2028;color:#e8e6df">${T('batchSetList')}</button></div>`;
       return;
     }
     if(!quizDeck.length){area.innerHTML=`<div style="text-align:center;padding:60px;color:#8a8880">${T('dkNoCards')}</div>`;return;}
@@ -2805,7 +2816,7 @@ function mkDenkou(c) {
   window['dkOpenBatch_'+sid]=(bi)=>dkBatchMenuRender(bi);
   window['dkStartFlash_'+sid]=(bi)=>dkBatchFlashRender(bi);
   window['dkStartQuiz_'+sid]=(bi)=>{dkCurBatch=bi;const bt=dkCurType;const batches=dkGetBatches(bt.items);dkBatchItems=[...batches[bi]];dkBatchQuizRender(sid);};
-  window['dkResetAll_'+sid]=()=>{if(!confirm('このタイプの進捗をリセットしますか？'))return;const bt=dkCurType;const batches=dkGetBatches(bt.items);batches.forEach((_,bi)=>{localStorage.removeItem(dkBatchKey(bt.key,bi,'done'));localStorage.removeItem(dkBatchKey(bt.key,bi,'unlock'));});batchSelectRender();};
+  window['dkResetAll_'+sid]=()=>{if(!confirm(T('batchConfirmReset')))return;const bt=dkCurType;const batches=dkGetBatches(bt.items);batches.forEach((_,bi)=>{localStorage.removeItem(dkBatchKey(bt.key,bi,'done'));localStorage.removeItem(dkBatchKey(bt.key,bi,'unlock'));});batchSelectRender();};
   window['dkF_'+sid]=(f)=>{filterMode=f;cardPos=0;if(mode==='flash')render();else{buildQuizDeck();render();}};
   window['dkFlip_'+sid]=()=>{isFlipped=!isFlipped;const fc=document.getElementById('dkFC_'+sid);if(fc){fc.classList.toggle('dk-flip',isFlipped);}};
   window['dkNext_'+sid]=()=>{const a=getActive();isFlipped=false;cardPos=(cardPos+1)%Math.max(a.length,1);if(typeof trackPV==='function')trackPV('/flash/denkou/'+(cardPos+1),'電工 Card '+(cardPos+1));renderFlash(sid);};
@@ -2848,6 +2859,7 @@ function mkDenkou(c) {
   // ─────────────────────────────────────────────
   function batchSelectRender() {
     dkView='select';
+    _nwSaveState('denkou', 'select', 0);
     dkBatchItems=[];
     const sid=c.id.replace(/\W/g,'_');
     let h=`<div class="dk-wrap">`;
@@ -2866,15 +2878,15 @@ function mkDenkou(c) {
     // 進捗バー
     h+=`<div style="background:#16181f;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:16px">`;
     h+=`<div style="display:flex;justify-content:space-between;margin-bottom:8px">`;
-    h+=`<span style="font-size:13px;font-weight:700;color:#e8e6df">${bt.label} 進捗</span>`;
-    h+=`<span style="font-size:12px;color:#8a8880">${doneCount}/${batches.length} セット完了</span>`;
+    h+=`<span style="font-size:13px;font-weight:700;color:#e8e6df">${bt.label} ${T('dkProgressLabel')}</span>`;
+    h+=`<span style="font-size:12px;color:#8a8880">${doneCount}/${batches.length} ${T('batchSetsComplete')}</span>`;
     h+=`</div>`;
     h+=`<div style="background:#252730;border-radius:20px;height:6px;overflow:hidden">`;
     h+=`<div style="height:100%;width:${pct}%;background:${bt.cls};border-radius:20px;transition:width .4s"></div>`;
     h+=`</div>`;
     h+=`<div style="margin-top:8px;display:flex;justify-content:space-between">`;
-    h+=`<span style="font-size:11px;color:#5a5856">${bt.items.length}語 / ${batches.length}セット × 10語</span>`;
-    if(doneCount>0){h+=`<button onclick="dkResetAll_${sid}()" style="font-size:11px;color:#5a5856;background:none;border:none;cursor:pointer;font-family:inherit">↺ リセット</button>`;}
+    h+=`<span style="font-size:11px;color:#5a5856">${bt.items.length}${T('dkWordsLabel')}${batches.length}${T('dkSetsLabel')}</span>`;
+    if(doneCount>0){h+=`<button onclick="dkResetAll_${sid}()" style="font-size:11px;color:#5a5856;background:none;border:none;cursor:pointer;font-family:inherit">${T('batchReset')}</button>`;}
     h+=`</div></div>`;
 
     // バッチグリッド
@@ -2889,10 +2901,10 @@ function mkDenkou(c) {
       else if(done) cardStyle+=`border-color:${bt.cls}55;cursor:pointer;`;
       else cardStyle+=`cursor:pointer;`;
       h+=`<div style="${cardStyle}" ${accessible?`onclick="dkOpenBatch_${sid}(${bi})"`:''}>`;
-      if(done){h+=`<div style="position:absolute;top:8px;right:8px;background:#6bbf8a;color:#000;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">✓ 完了</div>`;}
+      if(done){h+=`<div style="position:absolute;top:8px;right:8px;background:#6bbf8a;color:#000;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">${T('batchDone')}</div>`;}
       else if(!accessible){h+=`<div style="position:absolute;top:8px;right:8px;font-size:14px">🔒</div>`;}
       else{h+=`<div style="position:absolute;top:8px;right:8px;background:#e8a84c;color:#000;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">▶ 開始</div>`;}
-      h+=`<div style="font-size:10px;color:#5a5856;margin-bottom:6px">セット ${bi+1}</div>`;
+      h+=`<div style="font-size:10px;color:#5a5856;margin-bottom:6px">${T('dkSetLabel')} ${bi+1}</div>`;
       h+=`<div style="font-size:${startWord.length>4?'18':'26'}px;font-family:'Noto Serif JP',serif;font-weight:700;color:#e8e6df;margin-bottom:3px">${startWord}</div>`;
       h+=`<div style="font-size:10px;color:#8a8880">〜 ${endWord}</div>`;
       h+=`<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">`;
@@ -2907,6 +2919,7 @@ function mkDenkou(c) {
   }
 
   function dkBatchMenuRender(bi) {
+    _nwSaveState('denkou', 'menu', bi);
     dkCurBatch=bi;
     const sid=c.id.replace(/\W/g,'_');
     const bt=dkCurType;
@@ -2915,12 +2928,12 @@ function mkDenkou(c) {
     const done=dkIsDone(bt.key,bi);
     let h=`<div class="dk-wrap">`;
     h+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">`;
-    h+=`<button onclick="${sid}_bsR()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 12px;font-size:12px;color:#8a8880;cursor:pointer;font-family:inherit">← 一覧</button>`;
-    h+=`<div style="font-size:15px;font-weight:700;color:#e8e6df">セット${bi+1} — ${bt.label}</div>`;
+    h+=`<button onclick="${sid}_bsR()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 12px;font-size:12px;color:#8a8880;cursor:pointer;font-family:inherit">${T('batchList')}</button>`;
+    h+=`<div style="font-size:15px;font-weight:700;color:#e8e6df">${T('dkSetLabel')}${bi+1} — ${bt.label}</div>`;
     h+=`</div>`;
     // 単語プレビュー
     h+=`<div style="background:#16181f;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 16px;margin-bottom:20px">`;
-    h+=`<div style="font-size:10px;color:#5a5856;margin-bottom:8px;letter-spacing:.1em">このセットの語</div>`;
+    h+=`<div style="font-size:10px;color:#5a5856;margin-bottom:8px;letter-spacing:.1em">${T('dkWordsInSet')}</div>`;
     h+=`<div style="display:flex;flex-wrap:wrap;gap:6px">`;
     batch.forEach(item=>{h+=`<span style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:3px 10px;font-size:13px;color:#e8e6df">${item.k}</span>`;});
     h+=`</div></div>`;
@@ -2928,15 +2941,15 @@ function mkDenkou(c) {
     h+=`<div style="display:flex;flex-direction:column;gap:12px">`;
     h+=`<button onclick="dkStartFlash_${sid}(${bi})" style="display:flex;align-items:center;gap:14px;background:#16181f;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;text-align:left">`;
     h+=`<div style="width:48px;height:48px;border-radius:12px;background:#1e2028;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📇</div>`;
-    h+=`<div><div style="font-size:15px;font-weight:700;color:#e8e6df;margin-bottom:3px">フラッシュカード${done?' ✓':''}</div><div style="font-size:12px;color:#8a8880">${batch.length}枚のカードで学習</div></div></button>`;
+    h+=`<div><div style="font-size:15px;font-weight:700;color:#e8e6df;margin-bottom:3px">${T(done?'dkFlashDoneTitle':'dkFlashTitle')}</div><div style="font-size:12px;color:#8a8880">${batch.length}${T('dkCardCount')}</div></div></button>`;
     if(done){
       h+=`<button onclick="dkStartQuiz_${sid}(${bi})" style="display:flex;align-items:center;gap:14px;background:#16181f;border:1px solid rgba(232,168,76,.4);border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;text-align:left">`;
       h+=`<div style="width:48px;height:48px;border-radius:12px;background:#252730;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🎯</div>`;
-      h+=`<div><div style="font-size:15px;font-weight:700;color:#e8a84c;margin-bottom:3px">クイズ 🔓</div><div style="font-size:12px;color:#8a8880">意味・読み・用例クイズ</div></div></button>`;
+      h+=`<div><div style="font-size:15px;font-weight:700;color:#e8a84c;margin-bottom:3px">${T('dkQuizUnlocked')}</div><div style="font-size:12px;color:#8a8880">${T('dkQuizTypes')}</div></div></button>`;
     } else {
       h+=`<div style="display:flex;align-items:center;gap:14px;background:#16181f;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 20px;opacity:0.5">`;
       h+=`<div style="width:48px;height:48px;border-radius:12px;background:#252730;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔒</div>`;
-      h+=`<div><div style="font-size:15px;font-weight:700;color:#8a8880;margin-bottom:3px">クイズ（ロック中）</div><div style="font-size:12px;color:#5a5856">フラッシュカードを完了するとアンロック</div></div></div>`;
+      h+=`<div><div style="font-size:15px;font-weight:700;color:#8a8880;margin-bottom:3px">${T('dkQuizLocked')}</div><div style="font-size:12px;color:#5a5856">${T('dkUnlockHint')}</div></div></div>`;
     }
     h+=`</div></div>`;
     target.innerHTML=h;
@@ -2947,11 +2960,11 @@ function mkDenkou(c) {
     const bt=dkCurType;
     let h=`<div class="dk-wrap"><div style="text-align:center;padding:40px 20px">`;
     h+=`<div style="font-size:48px;margin-bottom:12px">🎉</div>`;
-    h+=`<div style="font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;color:#e8e6df;margin-bottom:8px">セット${bi+1}のカード完了！</div>`;
-    h+=`<div style="font-size:14px;color:#8a8880;margin-bottom:24px;line-height:1.8">クイズがアンロックされました！<br>同じ語でクイズを試しましょう。</div>`;
+    h+=`<div style="font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;color:#e8e6df;margin-bottom:8px">${T('dkSetLabel')}${bi+1}${T('dkCompleteTitle')}</div>`;
+    h+=`<div style="font-size:14px;color:#8a8880;margin-bottom:24px;line-height:1.8">${T('dkCardsDoneMsg')}<br>${T('dkCardsDoneMsg2')}</div>`;
     h+=`<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">`;
-    h+=`<button onclick="dkStartQuiz_${sid}(${bi})" style="background:#e8a84c;color:#000;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🎯 クイズを開始</button>`;
-    h+=`<button onclick="${sid}_bsR()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 24px;font-size:14px;color:#8a8880;cursor:pointer;font-family:inherit">← 戻る</button>`;
+    h+=`<button onclick="dkStartQuiz_${sid}(${bi})" style="background:#e8a84c;color:#000;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">${T('dkStartQuizBtn')}</button>`;
+    h+=`<button onclick="${sid}_bsR()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 24px;font-size:14px;color:#8a8880;cursor:pointer;font-family:inherit">${T('dkBackBtn')}</button>`;
     h+=`</div></div></div>`;
     target.innerHTML=h;
   }
@@ -2986,7 +2999,13 @@ function mkDenkou(c) {
     render();
   }
 
-  window[sid+'_bsR']();
+  // ── Restore view state after language switch ──
+  var _dkrs = _nwGetState('denkou');
+  if (_dkrs && _dkrs.view === 'menu' && typeof _dkrs.batchIdx === 'number') {
+    dkBatchMenuRender(_dkrs.batchIdx);
+  } else {
+    window[sid+'_bsR']();
+  }
 }
 
 
@@ -3027,6 +3046,7 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
   // ── SELECT SCREEN ──
   function renderSelect() {
     view = 'select';
+    _nwSaveState(modKey, 'select', 0);
     const lvl = curLevel;
     const batches = getBatches(lvl);
     const doneCount = batches.filter((_, bi) => isDone(lvl, bi)).length;
@@ -3048,16 +3068,16 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
     const pct = batches.length ? Math.round(doneCount/batches.length*100) : 0;
     h += `<div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid var(--brd)">`;
     h += `<div style="display:flex;justify-content:space-between;margin-bottom:8px">`;
-    h += `<span style="font-size:13px;font-weight:700;color:var(--tx)">${lvl.label} 全体進捗</span>`;
-    h += `<span style="font-size:12px;color:var(--txM)">${doneCount}/${batches.length} セット完了</span>`;
+    h += `<span style="font-size:13px;font-weight:700;color:var(--tx)">${lvl.label} ${T('batchProgress')}</span>`;
+    h += `<span style="font-size:12px;color:var(--txM)">${doneCount}/${batches.length} ${T('dkSetsCompleted')}</span>`;
     h += `</div>`;
     h += `<div style="background:var(--s3);border-radius:20px;height:8px;overflow:hidden">`;
     h += `<div style="height:100%;width:${pct}%;background:var(--g5);border-radius:20px;transition:width .4s"></div>`;
     h += `</div>`;
     h += `<div style="margin-top:8px;display:flex;gap:8px;justify-content:space-between;align-items:center">`;
-    h += `<span style="font-size:11px;color:var(--txD)">${lvl.data.length}語 / ${batches.length}セット × 10語</span>`;
+    h += `<span style="font-size:11px;color:var(--txD)">${lvl.data.length}${T('batchWordsPerSet').replace('{n}',batches.length)}</span>`;
     if (doneCount > 0) {
-      h += `<button onclick="${sid}_resetAll()" style="font-size:11px;color:var(--txD);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">↺ リセット</button>`;
+      h += `<button onclick="${sid}_resetAll()" style="font-size:11px;color:var(--txD);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">${T('batchReset')}</button>`;
     } else { h += `<span></span>`; }
     h += `</div></div>`;
 
@@ -3085,20 +3105,20 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
 
       // Status badge
       if (done) {
-        h += `<div style="position:absolute;top:8px;right:8px;background:var(--grn);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">✓ 完了</div>`;
+        h += `<div style="position:absolute;top:8px;right:8px;background:var(--grn);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">${T('batchDone')}</div>`;
       } else if (!accessible) {
         h += `<div style="position:absolute;top:8px;right:8px;font-size:14px">🔒</div>`;
       } else {
         h += `<div style="position:absolute;top:8px;right:8px;background:var(--acc);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">▶ 開始</div>`;
       }
 
-      h += `<div style="font-size:11px;font-weight:700;color:var(--txD);margin-bottom:6px">セット ${batchNum}</div>`;
+      h += `<div style="font-size:11px;font-weight:700;color:var(--txD);margin-bottom:6px">${T('batchSet')} ${batchNum}</div>`;
       h += `<div style="font-size:20px;font-family:'Zen Maru Gothic',sans-serif;font-weight:900;color:var(--tx);margin-bottom:4px">${startWord}</div>`;
       h += `<div style="font-size:11px;color:var(--txM)">〜 ${endWord}</div>`;
       h += `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">`;
       // Flash badge
       if (accessible) {
-        h += `<div style="display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:3px 8px;border-radius:20px;${done?'background:rgba(107,163,104,0.15);color:var(--grn)':'background:var(--s2);color:var(--txM)'}">📇 カード${done?'✓':''}</div>`;
+        h += `<div style="display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:3px 8px;border-radius:20px;${done?'background:rgba(107,163,104,0.15);color:var(--grn)':'background:var(--s2);color:var(--txM)'}">📇 ${done?'✓':''}</div>`;
         // Quiz badge
         if (done) {
           h += `<div style="display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(228,87,46,0.15);color:var(--acc)">🎯 クイズ</div>`;
@@ -3131,8 +3151,8 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
       const fcId = 'bfc_'+sid+'_'+bi;
       let h = '';
       h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">`;
-      h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
-      h += `<div style="flex:1;font-size:13px;font-weight:700;color:var(--txM)">セット${batchNum} フラッシュカード</div>`;
+      h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">${T('batchList')}</button>`;
+      h += `<div style="flex:1;font-size:13px;font-weight:700;color:var(--txM)">${T('batchSet')}${batchNum} ${T('batchFlashTitle')}</div>`;
       h += `<div style="font-size:12px;color:var(--txD)">${pos+1}/${order.length}</div>`;
       h += `</div>`;
       h += `<div class="prg"><div class="prg-bar"><div class="prg-fill" style="width:${pct}%"></div></div></div>`;
@@ -3143,7 +3163,7 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
       if (pos < order.length - 1) {
         h += `<button class="fc-b nx" style="background:var(--g1);color:#fff" onclick="${sid}_fn()">${T('next')}</button>`;
       } else {
-        h += `<button class="fc-b nx" style="background:var(--g5);color:#fff" onclick="${sid}_fdone(${bi})">✓ 完了！</button>`;
+        h += `<button class="fc-b nx" style="background:var(--g5);color:#fff" onclick="${sid}_fdone(${bi})">${T('batchCompleteFlash')}</button>`;
       }
       h += `</div>`;
       const target = c.querySelector('.u-content') || c;
@@ -3164,16 +3184,17 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
 
   // ── BATCH COMPLETE SCREEN ──
   function renderBatchComplete(bi) {
+    _nwSaveState(modKey, 'complete', bi);
     const lvl = curLevel;
     const batchNum = bi + 1;
     let h = '';
     h += `<div style="text-align:center;padding:40px 20px">`;
     h += `<div style="font-size:48px;margin-bottom:12px">🎉</div>`;
-    h += `<div style="font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;color:var(--tx);margin-bottom:8px">セット${batchNum}のカード完了！</div>`;
+    h += `<div style="font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;color:var(--tx);margin-bottom:8px">${T('batchSet')}${batchNum}${T('batchCardsDone')}</div>`;
     h += `<div style="font-size:14px;color:var(--txM);margin-bottom:24px;line-height:1.8">クイズがアンロックされました！<br>同じ10語でクイズを試しましょう。</div>`;
     h += `<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">`;
     h += `<button onclick="${sid}_startQuiz(${bi})" style="background:var(--g1);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🎯 クイズを開始</button>`;
-    h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:14px 24px;font-size:14px;color:var(--txM);cursor:pointer;font-family:inherit">← セット一覧に戻る</button>`;
+    h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:14px 24px;font-size:14px;color:var(--txM);cursor:pointer;font-family:inherit">${T('batchSetListBack')}</button>`;
     h += `</div>`;
     h += `</div>`;
     const target = c.querySelector('.u-content') || c;
@@ -3199,22 +3220,22 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
         // Score screen
         const t = sc.c + sc.w;
         const pct = t ? Math.round(sc.c/t*100) : 0;
-        const msg = pct >= 90 ? '完璧！素晴らしい！🏆' : pct >= 70 ? 'よくできました！👍' : 'もう一度頑張ろう！💪';
+        const msg = pct >= 90 ? T('score3') : pct >= 70 ? T('score1') : T('score0');
         let h = `<div style="text-align:center;padding:32px 20px">`;
         h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;justify-content:center">`;
-        h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
+        h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">${T('batchList')}</button>`;
         h += `</div>`;
         h += `<div style="font-size:56px;font-family:'Zen Maru Gothic',sans-serif;font-weight:900;color:var(--acc);margin-bottom:8px">${pct}%</div>`;
         h += `<div style="font-size:16px;color:var(--txM);margin-bottom:8px">${msg}</div>`;
-        h += `<div style="font-size:14px;color:var(--txD);margin-bottom:24px">正解 ${sc.c} / ${t}</div>`;
+        h += `<div style="font-size:14px;color:var(--txD);margin-bottom:24px">${T('scoreCo')} ${sc.c} / ${t}</div>`;
         h += `<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">`;
-        h += `<button onclick="${sid}_startQuiz(${bi})" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 24px;font-size:13px;color:var(--txM);cursor:pointer;font-family:inherit">🔄 もう一度</button>`;
+        h += `<button onclick="${sid}_startQuiz(${bi})" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 24px;font-size:13px;color:var(--txM);cursor:pointer;font-family:inherit">${T('again')}</button>`;
         // Next batch if available
         const nextBatches = getBatches(lvl);
         if (bi + 1 < nextBatches.length) {
-          h += `<button onclick="${sid}_openBatch(${bi+1})" style="background:var(--g1);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">次のセット → セット${batchNum+1}</button>`;
+          h += `<button onclick="${sid}_openBatch(${bi+1})" style="background:var(--g1);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">${T('batchNextSet')} → ${T('batchSet')}${batchNum+1}</button>`;
         } else {
-          h += `<button onclick="${sid}_backSelect()" style="background:var(--g5);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🎉 全セット完了！</button>`;
+          h += `<button onclick="${sid}_backSelect()" style="background:var(--g5);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">${T('batchAllDone')}</button>`;
         }
         h += `</div></div>`;
         const target = c.querySelector('.u-content') || c;
@@ -3243,8 +3264,8 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
 
       let h = '';
       h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">`;
-      h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
-      h += `<div style="flex:1;font-size:13px;font-weight:700;color:var(--txM)">セット${batchNum} クイズ</div>`;
+      h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">${T('batchList')}</button>`;
+      h += `<div style="flex:1;font-size:13px;font-weight:700;color:var(--txM)">${T('batchSet')}${batchNum} ${T('batchQuizTitle')}</div>`;
       h += `<div style="font-size:12px;color:var(--txD)">${pos+1}/${order.length}</div>`;
       h += `</div>`;
       h += `<div class="prg"><div class="prg-bar"><div class="prg-fill" style="width:${pct}%"></div></div></div>`;
@@ -3286,6 +3307,7 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
 
   // ── Batch entry point: show flash or quiz menu ──
   function renderBatchMenu(bi) {
+    _nwSaveState(modKey, 'menu', bi);
     const lvl = curLevel;
     const done = isDone(lvl, bi);
     const batchNum = bi + 1;
@@ -3293,13 +3315,13 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
 
     let h = '';
     h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">`;
-    h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
-    h += `<div style="font-size:15px;font-weight:700;color:var(--tx)">セット ${batchNum} — ${lvl.label}</div>`;
+    h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">${T('batchList')}</button>`;
+    h += `<div style="font-size:15px;font-weight:700;color:var(--tx)">${T('batchSet')} ${batchNum} — ${lvl.label}</div>`;
     h += `</div>`;
 
     // Word preview
     h += `<div style="background:var(--s2);border-radius:12px;padding:12px 16px;margin-bottom:20px;border:1px solid var(--brd)">`;
-    h += `<div style="font-size:11px;font-weight:700;color:var(--txD);margin-bottom:8px">このセットの10語</div>`;
+    h += `<div style="font-size:11px;font-weight:700;color:var(--txD);margin-bottom:8px">${T('batchSetWords')}</div>`;
     h += `<div style="display:flex;flex-wrap:wrap;gap:6px">`;
     batch.slice(0,10).forEach(item => {
       h += `<span style="background:var(--s1);border:1px solid var(--brd);border-radius:20px;padding:3px 10px;font-size:13px">${item[0]}</span>`;
@@ -3310,20 +3332,20 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
     // Flashcard button
     h += `<button onclick="${sid}_startFlash(${bi})" style="display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s;${done?'border-color:rgba(107,163,104,0.4)':''}">`;
     h += `<div style="width:48px;height:48px;border-radius:12px;background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📇</div>`;
-    h += `<div><div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:3px">フラッシュカード${done?' ✓':''}</div>`;
-    h += `<div style="font-size:12px;color:var(--txM)">10枚のカードで学習する</div></div></button>`;
+    h += `<div><div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:3px">${T(done?'batchFlashDone':'batchFlash')}</div>`;
+    h += `<div style="font-size:12px;color:var(--txM)">${batch.length} ${T('batchCardsCount')}</div></div></button>`;
 
     // Quiz button
     if (done) {
       h += `<button onclick="${sid}_startQuiz(${bi})" style="display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid rgba(228,87,46,0.4);border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">`;
       h += `<div style="width:48px;height:48px;border-radius:12px;background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🎯</div>`;
-      h += `<div><div style="font-size:15px;font-weight:700;color:var(--acc);margin-bottom:3px">クイズ 🔓</div>`;
-      h += `<div style="font-size:12px;color:var(--txM)">10問のクイズに挑戦</div></div></button>`;
+      h += `<div><div style="font-size:15px;font-weight:700;color:var(--acc);margin-bottom:3px">${T('batchQuizUnlocked')}</div>`;
+      h += `<div style="font-size:12px;color:var(--txM)">${T('batchQuizMeaning')}</div></div></button>`;
     } else {
       h += `<div style="display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:18px 20px;opacity:0.6">`;
       h += `<div style="width:48px;height:48px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔒</div>`;
-      h += `<div><div style="font-size:15px;font-weight:700;color:var(--txM);margin-bottom:3px">クイズ（ロック中）</div>`;
-      h += `<div style="font-size:12px;color:var(--txD)">フラッシュカードを完了するとアンロック</div></div></div>`;
+      h += `<div><div style="font-size:15px;font-weight:700;color:var(--txM);margin-bottom:3px">${T('batchQuizLocked')}</div>`;
+      h += `<div style="font-size:12px;color:var(--txD)">${T('batchQuizUnlockHint')}</div></div></div>`;
     }
     h += `</div>`;
 
@@ -3341,7 +3363,7 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
   window[sid+'_startFlash'] = bi => renderFlash(bi);
   window[sid+'_startQuiz'] = bi => renderQuiz(bi);
   window[sid+'_resetAll'] = () => {
-    if (!confirm('このレベルの進捗をリセットしますか？')) return;
+    if (!confirm(T('batchConfirmResetLvl'))) return;
     resetProgress(curLevel);
     renderSelect();
   };
@@ -3350,7 +3372,19 @@ function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
   let h = `<div class="mod-h"><div class="mod-t">${modKey === 'vocab' ? '📖 語彙' : modKey === 'kanji' ? '🈶 漢字' : '🔄 動詞活用'} — バッチ学習</div></div>`;
   h += `<div class="u-content" id="uc_${sid}"></div>`;
   c.innerHTML = h;
-  renderSelect();
+  // ── Restore view state after language switch ──
+  var _rs = _nwGetState(modKey);
+  if (_rs) {
+    if (_rs.view === 'menu' && typeof _rs.batchIdx === 'number') {
+      renderBatchMenu(_rs.batchIdx);
+    } else if (_rs.view === 'complete' && typeof _rs.batchIdx === 'number') {
+      renderBatchMenu(_rs.batchIdx);
+    } else {
+      renderSelect();
+    }
+  } else {
+    renderSelect();
+  }
 }
 
 function initM(c,id){
@@ -3489,6 +3523,7 @@ function initM(c,id){
 
   }
 }
+window.initM = initM;
 
 document.addEventListener('DOMContentLoaded', updateRankWidget);
 document.addEventListener('DOMContentLoaded',()=>setTimeout(updateRankWidget,100));
