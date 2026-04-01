@@ -536,22 +536,69 @@ const L={
   dkBackCards:{ja:'カードに戻る',en:'Back to Cards',bn:'কার্ডে ফিরুন'},
   dkNextQ:{ja:'次へ →',en:'Next →',bn:'পরবর্তী →'},
   dkAllCards:{ja:'全て',en:'All',bn:'সব'},
-  adv:{ja:'🔒 上級 (N3)',en:'🔒 Advanced (N3)',bn:'🔒 উন্নত (N3)'}
+  adv:{ja:'🔒 上級 (N3)',en:'🔒 Advanced (N3)',bn:'🔒 উন্নত (N3)'},
+
+  // ── Batch/Set UI strings ──
+  batchSet:{ja:'セット',en:'Set',bn:'সেট'},
+  batchDone:{ja:'✓ 完了',en:'✓ Done',bn:'✓ সম্পন্ন'},
+  batchStart:{ja:'▶ 開始',en:'▶ Start',bn:'▶ শুরু'},
+  batchList:{ja:'← 一覧',en:'← List',bn:'← তালিকা'},
+  batchProgress:{ja:'進捗',en:'Progress',bn:'অগ্রগতি'},
+  batchSetsComplete:{ja:'セット完了',en:'sets done',bn:'সেট সম্পন্ন'},
+  batchWordsPerSet:{ja:'語 / {n}セット × 10語',en:'words / {n} sets × 10',bn:'শব্দ / {n} সেট × ১০'},
+  batchReset:{ja:'↺ リセット',en:'↺ Reset',bn:'↺ রিসেট'},
+  batchWordsInSet:{ja:'このセットの語',en:'Words in this set',bn:'এই সেটের শব্দ'},
+  batchFlashDone:{ja:'フラッシュカード ✓',en:'Flashcards ✓',bn:'ফ্ল্যাশকার্ড ✓'},
+  batchFlash:{ja:'フラッシュカード',en:'Flashcards',bn:'ফ্ল্যাশকার্ড'},
+  batchCardsCount:{ja:'枚のカードで学習',en:'cards to study',bn:'কার্ড পড়ুন'},
+  batchQuizUnlocked:{ja:'クイズ 🔓',en:'Quiz 🔓',bn:'কুইজ 🔓'},
+  batchQuizMeaning:{ja:'意味・読み・用例クイズ',en:'Meaning/Reading/Example quiz',bn:'অর্থ/পড়া/উদাহরণ কুইজ'},
+  batchQuizLocked:{ja:'クイズ（ロック中）',en:'Quiz (Locked)',bn:'কুইজ (লক)'},
+  batchQuizUnlockHint:{ja:'フラッシュカードを完了するとアンロック',en:'Complete flashcards to unlock',bn:'ফ্ল্যাশকার্ড সম্পন্ন করলে আনলক হবে'},
+  batchCardsDone:{ja:'のカード完了！',en:'cards done!',bn:'কার্ড সম্পন্ন!'},
+  batchQuizUnlockedMsg:{ja:'クイズがアンロックされました！',en:'Quiz unlocked!',bn:'কুইজ আনলক হয়েছে!'},
+  batchQuizSameWords:{ja:'同じ語でクイズを試しましょう。',en:'Try the quiz with the same words.',bn:'একই শব্দ দিয়ে কুইজ করুন।'},
+  batchStartQuiz:{ja:'🎯 クイズを開始',en:'🎯 Start Quiz',bn:'🎯 কুইজ শুরু'},
+  batchBack:{ja:'← 戻る',en:'← Back',bn:'← ফিরুন'},
+  batchFlashTitle:{ja:'フラッシュカード',en:'Flashcards',bn:'ফ্ল্যাশকার্ড'},
+  batchQuizTitle:{ja:'クイズ',en:'Quiz',bn:'কুইজ'},
+  batchAllDone:{ja:'🎉 全セット完了！',en:'🎉 All sets done!',bn:'🎉 সব সেট সম্পন্ন!'},
+  batchNextSet:{ja:'次のセット →',en:'Next Set →',bn:'পরের সেট →'},
+  batchSetList:{ja:'← セット一覧',en:'← Set List',bn:'← সেট তালিকা'},
+  batchSetListBack:{ja:'← セット一覧に戻る',en:'← Back to Sets',bn:'← সেট তালিকায় ফিরুন'},
+  batchConfirmReset:{ja:'このタイプの進捗をリセットしますか？',en:'Reset progress for this type?',bn:'এই ধরনের অগ্রগতি রিসেট করবেন?'},
+  batchConfirmResetLvl:{ja:'このレベルの進捗をリセットしますか？',en:'Reset progress for this level?',bn:'এই স্তরের অগ্রগতি রিসেট করবেন?'},
+  batchSetWords:{ja:'このセットの10語',en:'10 words in this set',bn:'এই সেটের ১০টি শব্দ'},
+  batchCompleteFlash:{ja:'✓ 完了！',en:'✓ Done!',bn:'✓ সম্পন্ন!'},
+  batchHomeBack:{ja:'🏠 ホームに戻る',en:'🏠 Back to Home',bn:'🏠 হোমে ফিরুন'},
+  dkSetComplete:{ja:'のカード完了！',en:'set complete!',bn:'সেট সম্পন্ন!'},
+  dkNextSetBtn:{ja:'次のセット →',en:'Next Set →',bn:'পরের সেট →'},
+  dkSetListBtn:{ja:'← セット一覧',en:'← Set List',bn:'← সেট তালিকা'},
+  dkProgressLabel:{ja:'進捗',en:'Progress',bn:'অগ্রগতি'},
+  dkSetsCompleted:{ja:'セット完了',en:'sets done',bn:'সেট সম্পন্ন'},
+  dkWordsLabel:{ja:'語 / ',en:'words / ',bn:'শব্দ / '},
+  dkSetsLabel:{ja:'セット × 10語',en:'sets × 10',bn:'সেট × ১০'},
+  dkResetConfirm:{ja:'このタイプの進捗をリセットしますか？',en:'Reset progress for this type?',bn:'এই ধরনের অগ্রগতি রিসেট করবেন?'},
+  dkSetLabel:{ja:'セット',en:'Set',bn:'সেট'},
+  dkDoneLabel:{ja:'✓ 完了',en:'✓ Done',bn:'✓ সম্পন্ন'},
+  dkStartLabel:{ja:'▶ 開始',en:'▶ Start',bn:'▶ শুরু'},
+  dkListLabel:{ja:'← 一覧',en:'← List',bn:'← তালিকা'},
+  dkWordsInSet:{ja:'このセットの語',en:'Words in this set',bn:'এই সেটের শব্দ'},
+  dkSetTitle:{ja:'セット',en:'Set',bn:'সেট'},
+  dkFlashTitle:{ja:'フラッシュカード',en:'Flashcards',bn:'ফ্ল্যাশকার্ড'},
+  dkFlashDoneTitle:{ja:'フラッシュカード ✓',en:'Flashcards ✓',bn:'ফ্ল্যাশকার্ড ✓'},
+  dkCardCount:{ja:'枚のカードで学習',en:'cards to study',bn:'কার্ড পড়ুন'},
+  dkQuizUnlocked:{ja:'クイズ 🔓',en:'Quiz 🔓',bn:'কুইজ 🔓'},
+  dkQuizTypes:{ja:'意味・読み・用例クイズ',en:'Meaning · Reading · Example',bn:'অর্থ · পড়া · উদাহরণ'},
+  dkQuizLocked:{ja:'クイズ（ロック中）',en:'Quiz (Locked)',bn:'কুইজ (লক)'},
+  dkUnlockHint:{ja:'フラッシュカードを完了するとアンロック',en:'Complete flashcards to unlock',bn:'ফ্ল্যাশকার্ড শেষ করলে আনলক'},
+  dkCardsDoneMsg:{ja:'クイズがアンロックされました！',en:'Quiz unlocked!',bn:'কুইজ আনলক হয়েছে!'},
+  dkCardsDoneMsg2:{ja:'同じ語でクイズを試しましょう。',en:'Try the quiz with the same words.',bn:'একই শব্দ দিয়ে কুইজ করুন।'},
+  dkStartQuizBtn:{ja:'🎯 クイズを開始',en:'🎯 Start Quiz',bn:'🎯 কুইজ শুরু'},
+  dkBackBtn:{ja:'← 戻る',en:'← Back',bn:'← ফিরুন'},
+  dkCompleteTitle:{ja:'のカード完了！',en:'set complete!',bn:'সেট সম্পন্ন!'},
 };
 function T(k){return (L[k]&&L[k][_lang])||L[k]?.ja||k}
-function setLang(l){
-  _lang=l;localStorage.setItem('nw3_lang',l);
-  // Update lang button states
-  ['ja','en','bn'].forEach(function(lg){const b=document.getElementById('lb-'+lg);if(b){b.classList.toggle('on',lg===l);}});
-  // If inside a module, re-render it without losing position
-  if(curMod){
-    const c=document.getElementById('m-'+curMod);
-    if(c){c.innerHTML='';initM(c,curMod);}
-  } else {
-    // On home page: reload to apply translations to static script tags
-    location.reload();
-  }
-}
 
 </script>
 </head>
@@ -570,10 +617,25 @@ function setLang(l){
   <a href="index.html" class="logo" style="text-decoration:none;background:var(--g3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
     NIHONGO WORK <span class="logo-jp" style="-webkit-text-fill-color:var(--txM)">にほんごワーク</span>
   </a>
+  <div class="lang-sw">
+    <button class="lb" onclick="setLang('ja')" id="lb-ja">🇯🇵</button>
+    <button class="lb" onclick="setLang('en')" id="lb-en">EN</button>
+    <button class="lb" onclick="setLang('bn')" id="lb-bn">🇧🇩</button>
+  </div>
   <div class="top-r">
     <a href="index.html" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);text-decoration:none;display:flex;align-items:center;gap:4px">🏠 ホーム</a>
   </div>
 </div>
+
+<script>
+(function(){
+  var l=localStorage.getItem('nw3_lang')||'ja';
+  ['ja','en','bn'].forEach(function(lg){
+    var b=document.getElementById('lb-'+lg);
+    if(b) b.classList.toggle('on',lg===l);
+  });
+})();
+</script>
 
 <div style="max-width:720px;margin:0 auto;padding:20px 16px 10px">
   <h1 style="font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;margin-bottom:8px">🈶 漢字クイズ — Kanji Practice</h1>
@@ -634,6 +696,25 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   if (typeof updateRankWidget === 'function') updateRankWidget();
 });
+// ── Language switcher (defined here so core.js is already loaded) ──
+window.setLang = function(l) {
+  _lang = l;
+  localStorage.setItem('nw3_lang', l);
+  ['ja','en','bn'].forEach(function(lg) {
+    var b = document.getElementById('lb-'+lg);
+    if (b) b.classList.toggle('on', lg === l);
+  });
+  var modId='kanji';var c=document.getElementById('m-'+modId);if(c){c.innerHTML='';initM(c,modId);}
+};
+// Apply saved language on load
+(function() {
+  var l = localStorage.getItem('nw3_lang') || 'ja';
+  ['ja','en','bn'].forEach(function(lg) {
+    var b = document.getElementById('lb-'+lg);
+    if (b) b.classList.toggle('on', lg === l);
+  });
+})();
+
 </script>
 </body>
 </html>
