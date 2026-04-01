@@ -2804,6 +2804,369 @@ function mkDenkou(c) {
 }
 
 
+// ── Batch Learning System ──
+// 10-card flashcard → quiz unlock flow
+// localStorage keys:
+//   nw3_batch_done_{modKey}_{levelLabel}_{batchIdx} = '1' (flashcard completed)
+//   nw3_batch_unlock_{modKey}_{levelLabel}_{batchIdx} = '1' (quiz unlocked)
+function mkBatch(c, modKey, levels, frontFn, backFn, qFn, optFn, verbQF) {
+  const BATCH = 10;
+  const sid = c.id.replace(/\W/g,'_');
+  let curLevel = levels[0];
+  let view = 'select'; // 'select' | 'flash' | 'quiz'
+  let curBatch = 0;
+
+  function storeDoneKey(lvl, bi) { return 'nw3_batch_done_'+modKey+'_'+lvl.label+'_'+bi; }
+  function storeUnlockKey(lvl, bi) { return 'nw3_batch_unlock_'+modKey+'_'+lvl.label+'_'+bi; }
+  function isDone(lvl, bi) { return !!localStorage.getItem(storeDoneKey(lvl, bi)); }
+  function isUnlocked(lvl, bi) { return !!localStorage.getItem(storeUnlockKey(lvl, bi)); }
+  function setDone(lvl, bi) { localStorage.setItem(storeDoneKey(lvl, bi),'1'); }
+  function setUnlocked(lvl, bi) { localStorage.setItem(storeUnlockKey(lvl, bi),'1'); }
+
+  function getBatches(lvl) {
+    const d = lvl.data;
+    const out = [];
+    for (let i = 0; i < d.length; i += BATCH) out.push(d.slice(i, i+BATCH));
+    return out;
+  }
+
+  function resetProgress(lvl) {
+    const batches = getBatches(lvl);
+    batches.forEach((_, bi) => {
+      localStorage.removeItem(storeDoneKey(lvl, bi));
+      localStorage.removeItem(storeUnlockKey(lvl, bi));
+    });
+  }
+
+  // ── SELECT SCREEN ──
+  function renderSelect() {
+    view = 'select';
+    const lvl = curLevel;
+    const batches = getBatches(lvl);
+    const doneCount = batches.filter((_, bi) => isDone(lvl, bi)).length;
+    const unlockedCount = batches.filter((_, bi) => isUnlocked(lvl, bi)).length;
+
+    let h = '';
+    // Level tabs
+    h += `<div style="margin-bottom:16px">`;
+    h += `<div class="lvl-tabs" style="flex-wrap:wrap">`;
+    levels.forEach(lv => {
+      const cls = lv.cls || '';
+      const done = getBatches(lv).filter((_,bi)=>isDone(lv,bi)).length;
+      const total = getBatches(lv).length;
+      h += `<button class="lvl-b ${cls} ${curLevel.label===lv.label?'on':''}" onclick="${sid}_setLvl('${lv.label}')">${lv.label} <span style="font-size:10px;opacity:.7">${done}/${total}</span></button>`;
+    });
+    h += `</div></div>`;
+
+    // Progress bar
+    const pct = batches.length ? Math.round(doneCount/batches.length*100) : 0;
+    h += `<div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid var(--brd)">`;
+    h += `<div style="display:flex;justify-content:space-between;margin-bottom:8px">`;
+    h += `<span style="font-size:13px;font-weight:700;color:var(--tx)">${lvl.label} 全体進捗</span>`;
+    h += `<span style="font-size:12px;color:var(--txM)">${doneCount}/${batches.length} セット完了</span>`;
+    h += `</div>`;
+    h += `<div style="background:var(--s3);border-radius:20px;height:8px;overflow:hidden">`;
+    h += `<div style="height:100%;width:${pct}%;background:var(--g5);border-radius:20px;transition:width .4s"></div>`;
+    h += `</div>`;
+    h += `<div style="margin-top:8px;display:flex;gap:8px;justify-content:space-between;align-items:center">`;
+    h += `<span style="font-size:11px;color:var(--txD)">${lvl.data.length}語 / ${batches.length}セット × 10語</span>`;
+    if (doneCount > 0) {
+      h += `<button onclick="${sid}_resetAll()" style="font-size:11px;color:var(--txD);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">↺ リセット</button>`;
+    } else { h += `<span></span>`; }
+    h += `</div></div>`;
+
+    // Batch cards grid
+    h += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">`;
+    batches.forEach((batch, bi) => {
+      const done = isDone(lvl, bi);
+      const unlocked = isUnlocked(lvl, bi);
+      const startWord = batch[0][0] || '';
+      const endWord = batch[batch.length-1][0] || '';
+      const batchNum = bi + 1;
+
+      // Determine state
+      const isFirstOrPrevDone = bi === 0 || isDone(lvl, bi-1);
+      const accessible = isFirstOrPrevDone;
+
+      let cardStyle = `background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden`;
+      if (!accessible) {
+        cardStyle = `background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:14px;cursor:default;opacity:0.6;position:relative;overflow:hidden`;
+      } else if (done) {
+        cardStyle = `background:linear-gradient(135deg,rgba(107,163,104,0.08),rgba(8,145,178,0.06));border:1px solid rgba(107,163,104,0.3);border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden`;
+      }
+
+      h += `<div style="${cardStyle}" ${accessible ? `onclick="${sid}_openBatch(${bi})"` : ''}>`;
+
+      // Status badge
+      if (done) {
+        h += `<div style="position:absolute;top:8px;right:8px;background:var(--grn);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">✓ 完了</div>`;
+      } else if (!accessible) {
+        h += `<div style="position:absolute;top:8px;right:8px;font-size:14px">🔒</div>`;
+      } else {
+        h += `<div style="position:absolute;top:8px;right:8px;background:var(--acc);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">▶ 開始</div>`;
+      }
+
+      h += `<div style="font-size:11px;font-weight:700;color:var(--txD);margin-bottom:6px">セット ${batchNum}</div>`;
+      h += `<div style="font-size:20px;font-family:'Zen Maru Gothic',sans-serif;font-weight:900;color:var(--tx);margin-bottom:4px">${startWord}</div>`;
+      h += `<div style="font-size:11px;color:var(--txM)">〜 ${endWord}</div>`;
+      h += `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">`;
+      // Flash badge
+      if (accessible) {
+        h += `<div style="display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:3px 8px;border-radius:20px;${done?'background:rgba(107,163,104,0.15);color:var(--grn)':'background:var(--s2);color:var(--txM)'}">📇 カード${done?'✓':''}</div>`;
+        // Quiz badge
+        if (done) {
+          h += `<div style="display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(228,87,46,0.15);color:var(--acc)">🎯 クイズ</div>`;
+        } else {
+          h += `<div style="display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:3px 8px;border-radius:20px;background:var(--s2);color:var(--txD)">🔒 クイズ</div>`;
+        }
+      }
+      h += `</div>`;
+      h += `</div>`;
+    });
+    h += `</div>`;
+
+    const target = c.querySelector('.u-content') || c;
+    target.innerHTML = h;
+  }
+
+  // ── FLASH SCREEN for a batch ──
+  function renderFlash(bi) {
+    view = 'flash';
+    curBatch = bi;
+    const lvl = curLevel;
+    const batch = getBatches(lvl)[bi];
+    let pos = 0;
+    const order = shuf(batch.map((_,i)=>i));
+    const batchNum = bi + 1;
+
+    const render = () => {
+      const item = batch[order[pos]];
+      const pct = (pos+1)/order.length*100;
+      const fcId = 'bfc_'+sid+'_'+bi;
+      let h = '';
+      h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">`;
+      h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
+      h += `<div style="flex:1;font-size:13px;font-weight:700;color:var(--txM)">セット${batchNum} フラッシュカード</div>`;
+      h += `<div style="font-size:12px;color:var(--txD)">${pos+1}/${order.length}</div>`;
+      h += `</div>`;
+      h += `<div class="prg"><div class="prg-bar"><div class="prg-fill" style="width:${pct}%"></div></div></div>`;
+      h += `<div class="fcw" id="${fcId}_w"><div class="fc" id="${fcId}"><div class="fcf fc-fr"><div class="fc-bdg">${pos+1}/${order.length}</div>${frontFn(item)}<div class="fc-hint">${T('tap')}</div></div><div class="fc-bk-wrap">${backFn(item)}<div id="exbox_${fcId}" style="margin-top:6px"></div></div></div></div>`;
+      h += `<div class="fc-acts">`;
+      h += `<button class="fc-b pv" onclick="${sid}_fp()">${T('prev')}</button>`;
+      h += `<button class="tts" onclick="speak('${(item[0]||item.p||'').replace(/'/g,"\\'")}')">🔊</button>`;
+      if (pos < order.length - 1) {
+        h += `<button class="fc-b nx" style="background:var(--g1);color:#fff" onclick="${sid}_fn()">${T('next')}</button>`;
+      } else {
+        h += `<button class="fc-b nx" style="background:var(--g5);color:#fff" onclick="${sid}_fdone(${bi})">✓ 完了！</button>`;
+      }
+      h += `</div>`;
+      const target = c.querySelector('.u-content') || c;
+      target.innerHTML = h;
+      const fw = document.getElementById(fcId+'_w');
+      if (fw) fw.onclick = () => document.getElementById(fcId).classList.toggle('flip');
+    }
+
+    window[sid+'_fp'] = () => { pos = Math.max(0, pos-1); render(); };
+    window[sid+'_fn'] = () => { pos++; if(pos>=order.length) pos=order.length-1; render(); };
+    window[sid+'_fdone'] = (batchIdx) => {
+      setDone(lvl, batchIdx);
+      setUnlocked(lvl, batchIdx);
+      renderBatchComplete(batchIdx);
+    };
+    render();
+  }
+
+  // ── BATCH COMPLETE SCREEN ──
+  function renderBatchComplete(bi) {
+    const lvl = curLevel;
+    const batchNum = bi + 1;
+    let h = '';
+    h += `<div style="text-align:center;padding:40px 20px">`;
+    h += `<div style="font-size:48px;margin-bottom:12px">🎉</div>`;
+    h += `<div style="font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;color:var(--tx);margin-bottom:8px">セット${batchNum}のカード完了！</div>`;
+    h += `<div style="font-size:14px;color:var(--txM);margin-bottom:24px;line-height:1.8">クイズがアンロックされました！<br>同じ10語でクイズを試しましょう。</div>`;
+    h += `<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">`;
+    h += `<button onclick="${sid}_startQuiz(${bi})" style="background:var(--g1);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🎯 クイズを開始</button>`;
+    h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:14px 24px;font-size:14px;color:var(--txM);cursor:pointer;font-family:inherit">← セット一覧に戻る</button>`;
+    h += `</div>`;
+    h += `</div>`;
+    const target = c.querySelector('.u-content') || c;
+    target.innerHTML = h;
+  }
+
+  // ── QUIZ SCREEN for a batch ──
+  function renderQuiz(bi) {
+    view = 'quiz';
+    curBatch = bi;
+    const lvl = curLevel;
+    const batch = getBatches(lvl)[bi];
+    const batchNum = bi + 1;
+    let pos = 0;
+    const order = shuf(batch.map((_,i)=>i));
+    let sc = {c:0, w:0};
+    // For verb: pick random form
+    let vqf = null;
+    if (verbQF) vqf = verbQF[0];
+
+    const render = () => {
+      if (pos >= order.length) {
+        // Score screen
+        const t = sc.c + sc.w;
+        const pct = t ? Math.round(sc.c/t*100) : 0;
+        const msg = pct >= 90 ? '完璧！素晴らしい！🏆' : pct >= 70 ? 'よくできました！👍' : 'もう一度頑張ろう！💪';
+        let h = `<div style="text-align:center;padding:32px 20px">`;
+        h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;justify-content:center">`;
+        h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
+        h += `</div>`;
+        h += `<div style="font-size:56px;font-family:'Zen Maru Gothic',sans-serif;font-weight:900;color:var(--acc);margin-bottom:8px">${pct}%</div>`;
+        h += `<div style="font-size:16px;color:var(--txM);margin-bottom:8px">${msg}</div>`;
+        h += `<div style="font-size:14px;color:var(--txD);margin-bottom:24px">正解 ${sc.c} / ${t}</div>`;
+        h += `<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">`;
+        h += `<button onclick="${sid}_startQuiz(${bi})" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 24px;font-size:13px;color:var(--txM);cursor:pointer;font-family:inherit">🔄 もう一度</button>`;
+        // Next batch if available
+        const nextBatches = getBatches(lvl);
+        if (bi + 1 < nextBatches.length) {
+          h += `<button onclick="${sid}_openBatch(${bi+1})" style="background:var(--g1);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">次のセット → セット${batchNum+1}</button>`;
+        } else {
+          h += `<button onclick="${sid}_backSelect()" style="background:var(--g5);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🎉 全セット完了！</button>`;
+        }
+        h += `</div></div>`;
+        const target = c.querySelector('.u-content') || c;
+        target.innerHTML = h;
+        return;
+      }
+
+      const item = batch[order[pos]];
+      const pct = pos/order.length*100;
+
+      // Generate options
+      let opts, ci;
+      if (verbQF) {
+        vqf = verbQF[Math.floor(Math.random()*verbQF.length)];
+        const correct = item[vqf.i];
+        const others = shuf(verbQF.filter(f=>f!==vqf&&item[f.i]&&item[f.i]!==correct).map(f=>item[f.i])).slice(0,3);
+        const o = shuf([correct,...others]);
+        opts = o; ci = o.indexOf(correct);
+      } else {
+        const {opts:o, ci:c2} = optFn(item, batch);
+        opts = o; ci = c2;
+      }
+      const qText = verbQF
+        ? `<div class="qb"><div class="qT">${vqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${item[0]}</div><div class="qP">${item[1]}</div></div>`
+        : qFn(item);
+
+      let h = '';
+      h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">`;
+      h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
+      h += `<div style="flex:1;font-size:13px;font-weight:700;color:var(--txM)">セット${batchNum} クイズ</div>`;
+      h += `<div style="font-size:12px;color:var(--txD)">${pos+1}/${order.length}</div>`;
+      h += `</div>`;
+      h += `<div class="prg"><div class="prg-bar"><div class="prg-fill" style="width:${pct}%"></div></div></div>`;
+      h += qText;
+      const qid = 'bq_'+sid+'_'+bi+'_'+pos;
+      h += `<div id="${qid}" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">`;
+      opts.forEach((opt,oi) => {
+        h += `<div class="qo" data-v="${oi}" data-correct="${oi===ci?1:0}" onclick="${sid}_qa(this,${ci},'${qid}')" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;border:2px solid var(--brd);background:var(--s1);cursor:pointer;transition:all .15s;min-height:56px;text-align:center;font-size:13px;line-height:1.4">`;
+        h += `<span style="font-size:10px;font-weight:700;color:var(--txD);min-width:14px">${['A','B','C','D'][oi]}</span>`;
+        h += `<span>${opt||''}</span></div>`;
+      });
+      h += `</div>`;
+      h += `<div id="${qid}_fb" style="min-height:32px;text-align:center;padding:6px;font-weight:700;font-size:14px"></div>`;
+      const target = c.querySelector('.u-content') || c;
+      target.innerHTML = h;
+    }
+
+    window[sid+'_qa'] = (el, correctIdx, gridId) => {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const chosen = parseInt(el.dataset.v);
+      const isOk = chosen === correctIdx;
+      // Disable all
+      grid.querySelectorAll('.qo').forEach(o => {
+        o.onclick = null; o.style.cursor='default';
+        const v = parseInt(o.dataset.v);
+        if (v === correctIdx) { o.style.border='2px solid var(--grn)'; o.style.background='rgba(107,163,104,0.12)'; }
+        else if (v === chosen && !isOk) { o.style.border='2px solid var(--red)'; o.style.background='rgba(217,107,107,0.12)'; }
+      });
+      const fb = document.getElementById(gridId+'_fb');
+      if (fb) { fb.style.color=isOk?'var(--grn)':'var(--red)'; fb.textContent=isOk?T('correct'):T('incorrect'); }
+      if (isOk) sc.c++; else sc.w++;
+      if (typeof addS === 'function' && isOk) addS();
+      if (typeof rstS === 'function' && !isOk) rstS();
+      setTimeout(() => { pos++; render(); }, 900);
+    };
+    render();
+  }
+
+  // ── Batch entry point: show flash or quiz menu ──
+  function renderBatchMenu(bi) {
+    const lvl = curLevel;
+    const done = isDone(lvl, bi);
+    const batchNum = bi + 1;
+    const batch = getBatches(lvl)[bi];
+
+    let h = '';
+    h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">`;
+    h += `<button onclick="${sid}_backSelect()" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--txM);cursor:pointer;font-family:inherit">← 一覧</button>`;
+    h += `<div style="font-size:15px;font-weight:700;color:var(--tx)">セット ${batchNum} — ${lvl.label}</div>`;
+    h += `</div>`;
+
+    // Word preview
+    h += `<div style="background:var(--s2);border-radius:12px;padding:12px 16px;margin-bottom:20px;border:1px solid var(--brd)">`;
+    h += `<div style="font-size:11px;font-weight:700;color:var(--txD);margin-bottom:8px">このセットの10語</div>`;
+    h += `<div style="display:flex;flex-wrap:wrap;gap:6px">`;
+    batch.slice(0,10).forEach(item => {
+      h += `<span style="background:var(--s1);border:1px solid var(--brd);border-radius:20px;padding:3px 10px;font-size:13px">${item[0]}</span>`;
+    });
+    h += `</div></div>`;
+
+    h += `<div style="display:flex;flex-direction:column;gap:12px">`;
+    // Flashcard button
+    h += `<button onclick="${sid}_startFlash(${bi})" style="display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s;${done?'border-color:rgba(107,163,104,0.4)':''}">`;
+    h += `<div style="width:48px;height:48px;border-radius:12px;background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📇</div>`;
+    h += `<div><div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:3px">フラッシュカード${done?' ✓':''}</div>`;
+    h += `<div style="font-size:12px;color:var(--txM)">10枚のカードで学習する</div></div></button>`;
+
+    // Quiz button
+    if (done) {
+      h += `<button onclick="${sid}_startQuiz(${bi})" style="display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid rgba(228,87,46,0.4);border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">`;
+      h += `<div style="width:48px;height:48px;border-radius:12px;background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🎯</div>`;
+      h += `<div><div style="font-size:15px;font-weight:700;color:var(--acc);margin-bottom:3px">クイズ 🔓</div>`;
+      h += `<div style="font-size:12px;color:var(--txM)">10問のクイズに挑戦</div></div></button>`;
+    } else {
+      h += `<div style="display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:18px 20px;opacity:0.6">`;
+      h += `<div style="width:48px;height:48px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔒</div>`;
+      h += `<div><div style="font-size:15px;font-weight:700;color:var(--txM);margin-bottom:3px">クイズ（ロック中）</div>`;
+      h += `<div style="font-size:12px;color:var(--txD)">フラッシュカードを完了するとアンロック</div></div></div>`;
+    }
+    h += `</div>`;
+
+    const target = c.querySelector('.u-content') || c;
+    target.innerHTML = h;
+  }
+
+  // Wire up global handlers
+  window[sid+'_setLvl'] = label => {
+    const lv = levels.find(x=>x.label===label);
+    if (lv) { curLevel = lv; renderSelect(); }
+  };
+  window[sid+'_openBatch'] = bi => renderBatchMenu(bi);
+  window[sid+'_backSelect'] = () => renderSelect();
+  window[sid+'_startFlash'] = bi => renderFlash(bi);
+  window[sid+'_startQuiz'] = bi => renderQuiz(bi);
+  window[sid+'_resetAll'] = () => {
+    if (!confirm('このレベルの進捗をリセットしますか？')) return;
+    resetProgress(curLevel);
+    renderSelect();
+  };
+
+  // Initial render via mkU-like wrapper
+  let h = `<div class="mod-h"><div class="mod-t">${modKey === 'vocab' ? '📖 語彙' : modKey === 'kanji' ? '🈶 漢字' : '🔄 動詞活用'} — バッチ学習</div></div>`;
+  h += `<div class="u-content" id="uc_${sid}"></div>`;
+  c.innerHTML = h;
+  renderSelect();
+}
+
 function initM(c,id){
   switch(id){
     case 'kana':{
@@ -2822,52 +3185,36 @@ function initM(c,id){
       break;}
 
     case 'vocab':{
-      const ds=[{label:'N5',data:JLPT_V5,cls:'n5'},{label:'N4',data:JLPT_V4,cls:'n4'},{label:'入門',data:IRO_NY,cls:'iro'},{label:'初級1',data:IRO_S1,cls:'iro'},{label:'初級2',data:IRO_S2,cls:'iro'},{label:'N3',data:JLPT_V3,cls:'n3'}];
-      mkU(c,T('secVoc'),[
-        {label:T('tFlash'),type:'flash',init:cc=>mkF(cc,ds,T('secVoc'),'📖',
-          i=>`<div class="fc-big">${i[0]}</div><div style="margin-top:8px;font-size:18px;color:var(--txM);font-weight:500">${i[2]||''}</div>`,
-          i=>`<div style="width:100%"><div class="fc-lbl">${T('fRead')}</div><div class="fc-v ac" style="font-size:22px">${i[1]||''}</div><div class="fc-lbl">${T('fMean')} (English)</div><div class="fc-v" style="font-size:22px">${i[2]||''}</div>${i[3]?'<div class="fc-lbl">বাংলা</div><div class="fc-mn">🇧🇩 '+i[3]+'</div>':''}<button class="ex-btn" onclick="event.stopPropagation();genExample('${(i[0]||'').replace(/'/g,"\\'")}','${(i[2]||'').replace(/'/g,"\\'")}',this.nextElementSibling)">${T('exGen')}</button><div></div></div>`,'vocab')},
-        {label:T('tQuiz'),type:'quiz',init:cc=>mkQ(cc,ds,T('secVoc'),'📖',
-          i=>`<div class="qb"><div class="qT">${T('qMean')}</div><div class="qB">${i[0]}</div><div class="qP" style="font-size:14px;color:var(--txD)">${i[1]||''}</div></div>`,
-          (i,all)=>{const w=pick(all.filter(v=>v[2]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[2]),ci:o.indexOf(i)}},10,'vocab')}
-      ]);break;}
+      const ds=[{label:'N5',data:JLPT_V5,cls:'n5'},{label:'N4',data:JLPT_V4,cls:'n4'},{label:'入門',data:IRO_NY,cls:'iro'},{label:'初級1',data:IRO_S1,cls:'iro'},{label:'初級2',data:IRO_S2,cls:'iro'}];
+      mkBatch(c,'vocab',ds,
+        i=>`<div class="fc-big">${i[0]}</div><div style="margin-top:8px;font-size:18px;color:var(--txM);font-weight:500">${i[2]||''}</div>`,
+        i=>`<div style="width:100%"><div class="fc-lbl">${T('fRead')}</div><div class="fc-v ac" style="font-size:22px">${i[1]||''}</div><div class="fc-lbl">${T('fMean')} (English)</div><div class="fc-v" style="font-size:22px">${i[2]||''}</div>${i[3]?'<div class="fc-lbl">বাংলা</div><div class="fc-mn">🇧🇩 '+i[3]+'</div>':''}</div>`,
+        i=>`<div class="qb"><div class="qT">${T('qMean')}</div><div class="qB">${i[0]}</div><div class="qP" style="font-size:14px;color:var(--txD)">${i[1]||''}</div></div>`,
+        (i,batch)=>{const all=batch.filter(v=>v[2]);const w=pick(all.length>=4?all:JLPT_V5.filter(v=>v[2]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[2]),ci:o.indexOf(i)}},
+        null
+      );break;}
 
     case 'kanji':{
-      const ds=[{label:'N5',data:JLPT_K5,cls:'n5'},{label:'N4',data:JLPT_K4,cls:'n4'},{label:'N3',data:JLPT_K3,cls:'n3'}];
-      mkU(c,T('secKan'),[
-        {label:T('tFlash'),type:'flash',init:cc=>mkF(cc,ds,T('secKan'),'🈶',
-          i=>`<div class="fc-big">${i[0]}</div>`,
-          i=>`<div style="width:100%"><div class="fc-lbl">${T('fRead')}</div><div class="fc-v ac">${i[1]}</div><div class="fc-lbl">${T('fMean')} (English)</div><div class="fc-v">${K_EN[i[0]]||''}</div><div class="fc-lbl">${T('fEx')}</div><div class="fc-v" style="font-size:16px">${i[2]||''}</div></div>`,'kanji')},
-        {label:T('tQuiz'),type:'quiz',init:cc=>{
-          const LQF=[{l:T('f_onyomi'),i:1},{l:T('f_kunyomi'),i:1},{l:T('fMean'),i:2}];
-          let lqf=LQF[0];
-          mkQ(cc,ds,T('secKan'),'🈶',
-            i=>{lqf=LQF[Math.floor(Math.random()*LQF.length)];return`<div class="qb"><div class="qT">${lqf.l}${T('qForm')}</div><div class="qB" style="font-size:72px">${i[0]}</div></div>`},
-            (i,all)=>{if(lqf.i===2){const w=pick(all.filter(v=>K_EN[v[0]]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>K_EN[x[0]]||x[2]),ci:o.indexOf(i)}}const w=pick(all.filter(v=>v[1]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[1]),ci:o.indexOf(i)}},10,'kanji')}}
-      ]);break;}
+      const ds=[{label:'N5',data:JLPT_K5,cls:'n5'},{label:'N4',data:JLPT_K4,cls:'n4'}];
+      const _lqfPool=[{l:T('f_onyomi'),i:1},{l:T('f_kunyomi'),i:1},{l:T('fMean'),i:2}];
+      let _lqf=_lqfPool[0];
+      mkBatch(c,'kanji',ds,
+        i=>`<div class="fc-big" style="font-size:72px">${i[0]}</div>`,
+        i=>`<div style="width:100%"><div class="fc-lbl">${T('fRead')}</div><div class="fc-v ac">${i[1]}</div><div class="fc-lbl">${T('fMean')} (English)</div><div class="fc-v">${K_EN[i[0]]||''}</div><div class="fc-lbl">${T('fEx')}</div><div class="fc-v" style="font-size:16px">${i[2]||''}</div></div>`,
+        i=>{_lqf=_lqfPool[Math.floor(Math.random()*_lqfPool.length)];return`<div class="qb"><div class="qT">${_lqf.l}${T('qForm')}</div><div class="qB" style="font-size:72px">${i[0]}</div></div>`},
+        (i,batch)=>{if(_lqf.i===2){const w=pick(batch.filter(v=>K_EN[v[0]]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>K_EN[x[0]]||x[2]),ci:o.indexOf(i)}}const w=pick(batch.filter(v=>v[1]),3,i),o=shuf([i,...w]);return{opts:o.map(x=>x[1]),ci:o.indexOf(i)}},
+        null
+      );break;}
 
     case 'verb':{
       const VF=[{l:T('f_dict'),i:2},{l:T('f_nai'),i:3},{l:T('f_ta'),i:4},{l:T('f_te'),i:6},{l:T('f_ukemi'),i:10},{l:T('f_kanou'),i:13},{l:T('f_ikou'),i:15},{l:T('f_shieki'),i:16},{l:T('f_meirei'),i:18},{l:T('f_kinshi'),i:19}];
+      const QF=[{l:T('f_te'),i:6},{l:T('f_nai'),i:3},{l:T('f_ta'),i:4},{l:T('f_dict'),i:2},{l:T('f_ukemiK'),i:10},{l:T('f_kanouK'),i:13}];
       const ds=[{label:'N5',data:VERBS,cls:'n5'},{label:'N4',data:VERBS_N4,cls:'n4'}];
-      mkU(c,T('secVerb'),[
-        {label:T('tFlash'),type:'flash',init:cc=>mkF(cc,ds,T('secVerb'),'🔄',
-          i=>`<div class="fc-big" style="font-size:36px">${i[0]}</div><div style="margin-top:6px;font-size:13px;color:var(--txM)">${i[1]}</div>`,
-          i=>{const rows=VF.filter(f=>i[f.i]).map(f=>`<div style="display:flex;justify-content:space-between;padding:4px 8px;border-radius:6px;background:var(--s1);margin:2px 0"><span style="color:var(--txD);font-size:11px">${f.l}</span><span style="color:var(--acc);font-family:'DM Mono',monospace;font-size:14px">${i[f.i]}</span></div>`).join('');return`<div style="width:100%"><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">${rows}</div></div>`},'verb')},
-        {label:T('tQuiz'),type:'quiz',init:cc=>{
-          const QF=[{l:T('f_te'),i:6},{l:T('f_nai'),i:3},{l:T('f_ta'),i:4},{l:T('f_dict'),i:2},{l:T('f_ukemiK'),i:10},{l:T('f_kanouK'),i:13}];
-          let vqf=QF[0];
-          // optFnでvqfを決定し、qFnはvqfを読むだけ（変更しない）
-          mkQ(cc,ds,T('secVerb'),'🔄',
-            i=>`<div class="qb"><div class="qT">${vqf.l}${T('qForm')}</div><div class="qB" style="font-size:36px">${i[0]}</div><div class="qP">${i[1]}</div></div>`,
-            (i,all)=>{
-              vqf=QF[Math.floor(Math.random()*QF.length)];
-              const correct=i[vqf.i];
-              // 同じ動詞の他の活用形を選択肢にする
-              const others=shuf(QF.filter(f=>f!==vqf&&i[f.i]&&i[f.i]!==correct).map(f=>i[f.i])).slice(0,3);
-              const o=shuf([correct,...others]);
-              return{opts:o,ci:o.indexOf(correct)};
-            },10,'verb')}}
-      ]);break;}
+      mkBatch(c,'verb',ds,
+        i=>`<div class="fc-big" style="font-size:36px">${i[0]}</div><div style="margin-top:6px;font-size:13px;color:var(--txM)">${i[1]}</div>`,
+        i=>{const rows=VF.filter(f=>i[f.i]).map(f=>`<div style="display:flex;justify-content:space-between;padding:4px 8px;border-radius:6px;background:var(--s1);margin:2px 0"><span style="color:var(--txD);font-size:11px">${f.l}</span><span style="color:var(--acc);font-family:'DM Mono',monospace;font-size:14px">${i[f.i]}</span></div>`).join('');return`<div style="width:100%"><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">${rows}</div></div>`},
+        null, null, QF
+      );break;}
 
     case 'adj':{
       const AFI=[{l:T('f_hitei'),i:2},{l:T('f_kako'),i:3},{l:T('f_kakohitei'),i:4},{l:T('f_te'),i:5},{l:T('f_ku'),i:6},{l:T('f_ba'),i:7}];
