@@ -2696,10 +2696,7 @@ function mkDenkou(c) {
     const pct=mode==='flash'?(active.length?(cardPos+1)/active.length*100:0):(quizDeck.length?quizPos/quizDeck.length*100:0);
     const prog=mode==='flash'?`${Math.min(cardPos+1,active.length)}/${active.length}`:`${quizPos}/${quizDeck.length}`;
     let h=`<div class="dk-wrap">`;
-    h+=`<div class="dk-mode-tabs">`;
-    [['flash',T('dkFlash')],['meaning',T('dkMeaning')],['reading',T('dkReading')],['example',T('dkExample')],['vocab',T('dkVocab')]]
-      .forEach(([m,lbl])=>{h+=`<div class="dk-tab ${mode===m?'dk-on':''}" onclick="dkM_${sid}('${m}')">${lbl}</div>`;});
-    h+=`</div>`;
+    // タブバー非表示
     h+=`<div class="dk-ctrl">`;
     h+=`<button class="dk-btn" onclick="dkShuffle_${sid}()">${T('dkShuffle')}</button>`;
     h+=`<button class="dk-btn" onclick="dkReset_${sid}()">${T('dkReset')}</button>`;
@@ -2765,7 +2762,7 @@ function mkDenkou(c) {
       if(typeof trackPV==='function')trackPV('/quiz/denkou-'+mode+'/score','電工 '+mode+' Score');
       const t=quizScore.c+quizScore.w,p=t?Math.round(quizScore.c/t*100):0;
       const nextBi=dkCurBatch+1;const bt2=dkCurType;const hasNext=dkView==='quiz'&&bt2&&nextBi<dkGetBatches(bt2.items).length;
-    area.innerHTML=`<div class="dk-scr"><div class="dk-scr-big">${p}%</div><div class="dk-scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${quizScore.c}/${t})</div><div class="dk-tiles"><div class="dk-tile g"><div class="tl">${T('scoreCo')}</div><div class="tv">${quizScore.c}</div></div><div class="dk-tile r"><div class="tl">${T('scoreWr')}</div><div class="tv">${quizScore.w}</div></div><div class="dk-tile"><div class="tl">Total</div><div class="tv">${t}</div></div></div><button class="dk-nx-btn" onclick="dkRestart_${sid}()" style="margin-right:10px">${T('dkTryAgain')}</button>${hasNext?`<button class="dk-nx-btn" onclick="dkOpenBatch_${sid}(${nextBi})" style="background:#6bbf8a;color:#000;margin-right:10px">次のセット →</button>`:''}<button class="dk-nx-btn" onclick="batchSelectRender()" style="background:#1e2028;color:#e8e6df">← セット一覧</button></div>`;
+    area.innerHTML=`<div class="dk-scr"><div class="dk-scr-big">${p}%</div><div class="dk-scr-msg">${[T('score0'),T('score1'),T('score2'),T('score3')][p<50?0:p<75?1:p<95?2:3]} (${quizScore.c}/${t})</div><div class="dk-tiles"><div class="dk-tile g"><div class="tl">${T('scoreCo')}</div><div class="tv">${quizScore.c}</div></div><div class="dk-tile r"><div class="tl">${T('scoreWr')}</div><div class="tv">${quizScore.w}</div></div><div class="dk-tile"><div class="tl">Total</div><div class="tv">${t}</div></div></div><button class="dk-nx-btn" onclick="dkRestart_${sid}()" style="margin-right:10px">${T('dkTryAgain')}</button>${hasNext?`<button class="dk-nx-btn" onclick="dkOpenBatch_${sid}(${nextBi})" style="background:#6bbf8a;color:#000;margin-right:10px">次のセット →</button>`:''}<button class="dk-nx-btn" onclick="${sid}_bsR()" style="background:#1e2028;color:#e8e6df">← セット一覧</button></div>`;
       return;
     }
     if(!quizDeck.length){area.innerHTML=`<div style="text-align:center;padding:60px;color:#8a8880">${T('dkNoCards')}</div>`;return;}
@@ -2804,6 +2801,7 @@ function mkDenkou(c) {
   window['dkReset_'+sid]=()=>{deckIdx=ALL_D.map((_,i)=>i);cardPos=0;flagged.clear();typeFilter='all';filterMode='all';isFlipped=false;if(mode==='flash')render();else{buildQuizDeck();render();}};
   window['dkT_'+sid]=(t)=>{typeFilter=t;cardPos=0;if(mode==='flash')render();else{buildQuizDeck();render();}};
   window['dkSelType_'+sid]=(key)=>{const bt=BATCH_TYPES.find(x=>x.key===key);if(bt){dkCurType=bt;}batchSelectRender();};
+  window[sid+'_bsR']=()=>batchSelectRender();
   window['dkOpenBatch_'+sid]=(bi)=>dkBatchMenuRender(bi);
   window['dkStartFlash_'+sid]=(bi)=>dkBatchFlashRender(bi);
   window['dkStartQuiz_'+sid]=(bi)=>{dkCurBatch=bi;const bt=dkCurType;const batches=dkGetBatches(bt.items);dkBatchItems=[...batches[bi]];dkBatchQuizRender(sid);};
@@ -2917,7 +2915,7 @@ function mkDenkou(c) {
     const done=dkIsDone(bt.key,bi);
     let h=`<div class="dk-wrap">`;
     h+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">`;
-    h+=`<button onclick="batchSelectRender()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 12px;font-size:12px;color:#8a8880;cursor:pointer;font-family:inherit">← 一覧</button>`;
+    h+=`<button onclick="${sid}_bsR()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 12px;font-size:12px;color:#8a8880;cursor:pointer;font-family:inherit">← 一覧</button>`;
     h+=`<div style="font-size:15px;font-weight:700;color:#e8e6df">セット${bi+1} — ${bt.label}</div>`;
     h+=`</div>`;
     // 単語プレビュー
@@ -2953,7 +2951,7 @@ function mkDenkou(c) {
     h+=`<div style="font-size:14px;color:#8a8880;margin-bottom:24px;line-height:1.8">クイズがアンロックされました！<br>同じ語でクイズを試しましょう。</div>`;
     h+=`<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">`;
     h+=`<button onclick="dkStartQuiz_${sid}(${bi})" style="background:#e8a84c;color:#000;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">🎯 クイズを開始</button>`;
-    h+=`<button onclick="dkBatchMenuRender(${bi})" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 24px;font-size:14px;color:#8a8880;cursor:pointer;font-family:inherit">← 戻る</button>`;
+    h+=`<button onclick="${sid}_bsR()" style="background:#252730;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 24px;font-size:14px;color:#8a8880;cursor:pointer;font-family:inherit">← 戻る</button>`;
     h+=`</div></div></div>`;
     target.innerHTML=h;
   }
@@ -2988,7 +2986,7 @@ function mkDenkou(c) {
     render();
   }
 
-  batchSelectRender();
+  window[sid+'_bsR']();
 }
 
 
