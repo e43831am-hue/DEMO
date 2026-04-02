@@ -95,33 +95,22 @@ body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;
 /* ── BATTLE MAP HEADER ── */
 .battle-header{background:linear-gradient(180deg,rgba(20,12,4,0.98) 0%,rgba(26,18,8,0.95) 100%);
   border:1px solid var(--brdS);margin:10px 12px 0;border-radius:6px 6px 0 0;
-  padding:14px 18px;position:relative;overflow:hidden}
+  padding:0;position:relative;overflow:hidden}
 .battle-header::before{content:'';position:absolute;inset:0;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L95 27.5 L95 72.5 L50 95 L5 72.5 L5 27.5Z' fill='none' stroke='rgba(200,150,60,0.04)' stroke-width='1'/%3E%3C/svg%3E") repeat;
   pointer-events:none}
-.bh-top{display:flex;align-items:center;gap:14px;position:relative}
-/* Circular progress — 制圧率 */
-.domination-ring{position:relative;width:72px;height:72px;flex-shrink:0}
-.domination-ring svg{transform:rotate(-90deg);filter:drop-shadow(0 0 6px rgba(192,57,43,0.5))}
-.domination-ring .bg-c{fill:none;stroke:#2a1a08;stroke-width:5}
-.domination-ring .fg-c{fill:none;stroke:#c0392b;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
-.dom-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.dom-pct{font-family:'Zen Maru Gothic',sans-serif;font-size:17px;font-weight:900;color:#e8d5b0;line-height:1}
-.dom-sub{font-size:8px;color:var(--txM);margin-top:1px}
-.bh-title-area{flex:1}
-.bh-title{font-family:'Zen Maru Gothic',sans-serif;font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px}
-.bh-sub{font-size:10px;color:var(--txM)}
-/* Stat counters top-right */
+.bh-top{display:flex;align-items:stretch;gap:0;position:relative}
 .bh-counters{display:flex;gap:8px;margin-left:auto}
-.bh-counter{text-align:center;min-width:52px;padding:6px 8px;border-radius:3px;border:1px solid}
-.bh-counter.enemies{background:rgba(192,57,43,0.18);border-color:rgba(192,57,43,0.5)}
+.bh-counter{text-align:center;padding:12px 8px;border-radius:3px;border:1px solid}
+.bh-counter.enemies{background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4)}
 .bh-counter.enemies .bc-n{color:#e05c4a;font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;line-height:1}
-.bh-counter.controlled{background:rgba(44,95,138,0.15);border-color:rgba(44,95,138,0.4)}
+.bh-counter.controlled{background:rgba(44,95,138,0.12);border-color:rgba(44,95,138,0.35)}
 .bh-counter.controlled .bc-n{color:#5b9fd4;font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;line-height:1}
-.bh-counter.today{background:rgba(200,150,10,0.12);border-color:rgba(200,150,10,0.35)}
+.bh-counter.today{background:rgba(200,150,10,0.10);border-color:rgba(200,150,10,0.3)}
 .bh-counter.today .bc-n{color:#d4a836;font-family:'Zen Maru Gothic',sans-serif;font-size:22px;font-weight:900;line-height:1}
-.bc-l{font-size:9px;color:var(--txM);margin-top:2px}
-.bc-icon{font-size:9px;margin-bottom:1px}
+.bc-n{font-family:'Zen Maru Gothic',sans-serif;font-weight:900;line-height:1.1;transition:all 0.4s ease}
+.bc-l{font-size:10px;color:var(--txM);margin-top:4px}
+.bc-icon{font-size:10px;margin-bottom:4px;font-weight:600}
 
 /* ── HEXAGONAL BATTLE MAP ── */
 .battle-map{background:linear-gradient(180deg,#0d0805 0%,#140c04 40%,#0a0604 100%);
@@ -200,9 +189,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;
 /* ── BATTLE BUTTONS ── */
 .battle-actions{display:flex;margin:0 12px;border:1px solid var(--brdS);border-top:none;
   border-radius:0 0 6px 6px;overflow:hidden}
-.battle-btn{flex:1;padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;
-  border:none;font-family:'Zen Maru Gothic',sans-serif;font-size:13px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.battle-btn{flex:1;padding:16px 8px;text-align:center;cursor:pointer;transition:all .2s;
+  border:none;font-family:'Zen Maru Gothic',sans-serif;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;letter-spacing:.02em}
 .battle-btn.primary{background:linear-gradient(135deg,#b02a1e,#8b1a10);color:#f5d5c0;
   border-right:1px solid rgba(200,150,60,0.2)}
 .battle-btn.primary:hover{background:linear-gradient(135deg,#c0392b,#96281b);
@@ -232,15 +221,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;
   margin:20px 12px 10px;letter-spacing:.08em;display:flex;align-items:center;gap:8px;text-transform:uppercase}
 .sec-t::after{content:'';flex:1;height:1px;background:var(--brd)}
 
-/* ── BOTTOM NAV (module grid) ── */
-.bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--brdS);
-  margin:0 12px;background:rgba(10,8,4,0.6)}
-.bn-item{padding:14px 8px 12px;text-align:center;cursor:pointer;transition:all .2s;
-  border-right:1px solid var(--brd);text-decoration:none;color:inherit;display:block}
-.bn-item:last-child{border-right:none}
-.bn-item:hover{background:rgba(200,150,60,0.05)}
-.bn-icon{font-family:'Zen Maru Gothic',sans-serif;font-size:24px;line-height:1;margin-bottom:4px;display:block;color:var(--tx)}
-.bn-label{font-size:10px;color:var(--txM);letter-spacing:.04em}
+/* bottom-nav removed */
 
 /* ── CARD GRID ── */
 .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:0 12px 16px}
@@ -768,61 +749,21 @@ function setLang(l){
   </div>
 </div>
 
-<!-- Rank Progress Bar -->
-<div id="rank-widget" style="background:rgba(8,6,3,0.95);color:#e8d5b0;padding:6px 16px;border-bottom:1px solid rgba(200,150,60,0.2);position:sticky;top:52px;z-index:90">
-  <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <div id="rw-badge" style="font-size:11px;font-weight:700;background:rgba(192,57,43,0.2);border:1px solid rgba(192,57,43,0.4);padding:3px 10px;border-radius:3px;white-space:nowrap;color:#e05c4a"><script>document.write({ja:'🌱 初心者',en:'🌱 Beginner',bn:'🌱 শিক্ষানবিশ'}[_lang]||'🌱 初心者')</script></div>
-    <div style="flex:1;min-width:100px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:9px;opacity:.6;color:#a89070"><script>document.write(T('n5passRate'))</script></span>
-        <span id="rw-pct" style="font-size:9px;font-weight:700;color:#c8960a">0%</span>
-      </div>
-      <div style="background:rgba(255,255,255,0.08);height:4px;border-radius:2px;overflow:hidden">
-        <div id="rw-bar" style="background:linear-gradient(90deg,#c0392b,#c8960a);height:100%;border-radius:2px;width:0%;transition:width 0.8s ease"></div>
-      </div>
-    </div>
-    <button onclick="openM('revenge')" style="background:rgba(192,57,43,0.2);color:#e05c4a;border:1px solid rgba(192,57,43,0.4);padding:5px 12px;border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">⚔️ リベンジ</button>
-  </div>
-</div>
-
 <div class="home" id="homeV">
 
-  <!-- ── BATTLE HEADER (制圧率 + stats) ── -->
+  <!-- ── BATTLE HEADER ── -->
   <div class="battle-header">
-    <div class="bh-top">
-      <!-- Domination ring -->
-      <div class="domination-ring">
-        <svg width="72" height="72" viewBox="0 0 72 72">
-          <circle class="bg-c" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="0"/>
-          <circle class="fg-c" id="dom-ring-fg" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
-        </svg>
-        <div class="dom-label">
-          <div class="dom-pct" id="dom-pct-text">0%</div>
-          <div class="dom-sub">制圧率</div>
-        </div>
+    <div class="bh-top" style="gap:0">
+      <div class="bh-counter enemies" style="flex:1;text-align:center;padding:14px 8px">
+        <div class="bc-icon" id="lbl-enemies">💀 間違えた問題数</div>
+        <div class="bc-n" id="dom-enemies" style="font-size:52px">--</div>
+        <div class="bc-l" id="lbl-wrong-sub">問題</div>
       </div>
-      <!-- Title -->
-      <div class="bh-title-area">
-        <div class="bh-title">制圧率</div>
-        <div class="bh-sub" id="dom-sub-text">N5 文字中</div>
-      </div>
-      <!-- Counters -->
-      <div class="bh-counters">
-        <div class="bh-counter enemies">
-          <div class="bc-icon">💀 敵手</div>
-          <div class="bc-n" id="dom-enemies">--</div>
-          <div class="bc-l">弱点数</div>
-        </div>
-        <div class="bh-counter controlled">
-          <div class="bc-icon">✕ 制圧</div>
-          <div class="bc-n" id="dom-controlled">0</div>
-          <div class="bc-l">x制圧</div>
-        </div>
-        <div class="bh-counter today">
-          <div class="bc-icon">📅 今日</div>
-          <div class="bc-n" id="dom-today">0</div>
-          <div class="bc-l">今日</div>
-        </div>
+      <div style="width:1px;background:rgba(200,150,60,0.2);margin:8px 0"></div>
+      <div class="bh-counter controlled" style="flex:1;text-align:center;padding:14px 8px">
+        <div class="bc-icon" id="lbl-controlled">⚔ 制圧</div>
+        <div class="bc-n" id="dom-controlled" style="font-size:52px">0</div>
+        <div class="bc-l" id="lbl-ctrl-sub">問制圧済</div>
       </div>
     </div>
   </div>
@@ -926,60 +867,36 @@ function setLang(l){
 
     <!-- Legend -->
     <div class="map-legend">
-      <div class="leg-item"><div class="leg-dot red"></div>敵支配</div>
-      <div class="leg-item"><div class="leg-dot yellow"></div>交戦中</div>
-      <div class="leg-item"><div class="leg-dot green"></div>制圧済</div>
-      <div class="leg-item"><div class="leg-dot dark"></div>霧の戦場</div>
+      <div class="leg-item"><div class="leg-dot red"></div><span id="leg-red">敵支配</span></div>
+      <div class="leg-item"><div class="leg-dot yellow"></div><span id="leg-yellow">交戦中</span></div>
+      <div class="leg-item"><div class="leg-dot green"></div><span id="leg-green">制圧済</span></div>
+      <div class="leg-item"><div class="leg-dot dark"></div><span id="leg-dark">霧の戦場</span></div>
     </div>
   </div>
 
   <!-- ── BATTLE BUTTONS ── -->
-  <div class="battle-actions">
-    <a class="battle-btn primary" href="vocab.html">
-      <span>✕</span> 攻略開始
-    </a>
-    <a class="battle-btn secondary" onclick="openM('revenge');return false;" href="#">
-      <span>⚔</span> リベンジ道場
-    </a>
+  <div class="battle-actions" style="display:block">
+    <button class="battle-btn primary" onclick="startWrongQuiz()" style="width:100%;border-radius:0;font-size:15px;padding:16px" id="attack-btn">
+      <span>⚔</span> <span id="attack-btn-label">間違えた問題を攻略開始</span>
+    </button>
+  </div>
+  <!-- Wrong Quiz Overlay -->
+  <div id="wrong-quiz-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto">
+    <div style="max-width:600px;margin:0 auto;padding:20px">
+      <div id="wrong-quiz-inner"></div>
+    </div>
   </div>
 
-  <!-- ── STUDY MENU ── -->
-  <div class="study-menu-label">＋ 学習メニュー</div>
-
-  <!-- Bottom nav icons -->
-  <div class="bottom-nav">
-    <a class="bn-item" href="kana-practice.html">
-      <span class="bn-icon">あ</span>
-      <div class="bn-label">もじ</div>
-    </a>
-    <a class="bn-item" href="vocab.html">
-      <span class="bn-icon">📖</span>
-      <div class="bn-label">語彙</div>
-    </a>
-    <a class="bn-item" href="kanji.html">
-      <span class="bn-icon">漢</span>
-      <div class="bn-label">漢字</div>
-    </a>
-    <a class="bn-item" href="verb.html">
-      <span class="bn-icon">🔄</span>
-      <div class="bn-label">動詞</div>
-    </a>
-  </div>
-
-  <!-- ★ 苦手克服ダッシュボード ★ -->
-  <div id="nw-dashboard" style="padding:0 12px 8px"></div>
-
-  <div id="home-extras">
-  <div class="sec-t"><script>document.write(T('specialSec'))</script></div>
+  <!-- ── スペシャル学習 ── -->
+  <div class="sec-t" style="margin:20px 12px 10px"><script>document.write(T('specialSec'))</script></div>
   <div class="cg">
     <a class="cd c1" href="biz.html" style="text-decoration:none;color:inherit"><span class="cd-i">💼</span><div class="cd-n">ビジネスマナー</div><div class="cd-d">○×クイズ 99問</div></a>
     <a class="cd c5" href="denkou.html" style="text-decoration:none;color:inherit"><span class="cd-i">⚡</span><div class="cd-n">電気工事士</div><div class="cd-d">電工漢字・専門用語</div></a>
-    <a class="cd c3" href="grammar.html" style="text-decoration:none;color:inherit"><span class="cd-i">📗</span><div class="cd-n"><script>document.write(T('secGram'))</script></div><div class="cd-d"><script>document.write(T('cdGram'))</script></div><div class="cd-count">26+18</div></a>
-    <a class="cd c2" href="timenum.html" style="text-decoration:none;color:inherit"><span class="cd-i">🕐</span><div class="cd-n"><script>document.write(T('secTime'))</script></div><div class="cd-d"><script>document.write(T('cdTime'))</script></div></a>
   </div>
 
-  <div class="sec-t" style="margin-top:20px">📚 Articles &amp; Guides</div>
-  <div style="padding:0 4px 8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin:0 12px">
+  <!-- ── Articles & Guides ── -->
+  <div class="sec-t" style="margin:20px 12px 10px">📚 Articles &amp; Guides</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin:0 12px 8px">
     <a href="roadmap.html" style="background:var(--s1);border:1px solid var(--brd);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;display:block;text-decoration:none" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(200,150,10,0.4)'" onmouseout="this.style.transform='';this.style.borderColor=''">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(135deg,#c8960a,#c0392b)"></div>
       <div style="font-size:24px;margin-bottom:6px">🗺</div>
@@ -994,8 +911,7 @@ function setLang(l){
     </a>
   </div>
 
-  <div style="text-align:center;padding:24px 0 48px;color:var(--txD);font-size:10px;letter-spacing:.08em">NIHONGO WORK v10 — Built for Bangladeshi workers in Japan</div>
-  </div>
+  <div style="text-align:center;padding:20px 0 40px;color:var(--txD);font-size:10px;letter-spacing:.08em">NIHONGO WORK v10 — Built for Bangladeshi workers in Japan</div>
 
 </div>
 
@@ -1006,78 +922,464 @@ function setLang(l){
 <script src="./core.js"></script>
 <script src="./enhanced.js"></script>
 <script>
-// ── Battle Map Init ──
-(function initBattleMap(){
-  // Read accuracy from localStorage (same keys as enhanced.js uses)
-  function getAcc(key){
-    try{
-      const raw=localStorage.getItem('nw3_acc_'+key);
-      if(!raw)return null;
-      const d=JSON.parse(raw);
-      const total=(d.c||0)+(d.w||0);
-      return total>0?Math.round((d.c||0)/total*100):null;
-    }catch(e){return null}
-  }
-  // Map hex IDs to localStorage keys
-  const hexMap=[
-    {id:'hpct-kana',   key:'kana_hira',  el:'hex-kana'},
-    {id:'hpct-kata',   key:'kana_kata',  el:'hex-kata'},
-    {id:'hpct-vocab',  key:'vocab_n5',   el:'hex-vocab'},
-    {id:'hpct-kanji',  key:'kanji_n5',   el:'hex-kanji'},
-    {id:'hpct-verb',   key:'verb',       el:'hex-verb'},
-    {id:'hpct-adj',    key:'adj',        el:'hex-adj'},
-    {id:'hpct-vocab4', key:'vocab_n4',   el:'hex-vocab4'},
-    {id:'hpct-gram',   key:'gram',       el:'hex-gram'},
-    {id:'hpct-part',   key:'particle',   el:'hex-part'},
-    {id:'hpct-kanji4', key:'kanji_n4',   el:'hex-kanji4'},
-    {id:'hpct-time',   key:'time',       el:'hex-time'},
-  ];
+// ═══════════════════════════════════════════════════════
+//  BATTLE MAP ENGINE — 全機能実装
+// ═══════════════════════════════════════════════════════
 
-  let totalPct=0, counted=0, weakTotal=0;
-  hexMap.forEach(function(h){
-    const pct=getAcc(h.key);
-    const el=document.getElementById(h.el);
-    const txt=document.getElementById(h.id);
-    if(!txt)return;
-    if(pct===null){txt.textContent='?';return;}
-    txt.textContent=pct+'%';
-    totalPct+=pct; counted++;
-    if(pct<60)weakTotal++;
-    // Update hex color based on accuracy
+// ── SRS キーから全問データを集計
+// SRS._key = 'nw3_srs_' + mod + '_' + item[0 or q or p]
+// ここではlocalStorageを直接スキャンして集計する
+
+// モジュール定義: hex id → SRS modKey + data配列
+// data配列はdata.jsが読み込まれた後に参照
+function getBattleData() {
+  const mods = [
+    { id:'hex-kana',   pctId:'hpct-kana',   mod:'kana',    getData:()=>[...HB,...HD],
+      nameJa:'ひらがな', nameEn:'Hiragana', nameBn:'হিরাগানা' },
+    { id:'hex-kata',   pctId:'hpct-kata',   mod:'kana',    getData:()=>[...KB,...KD],
+      nameJa:'カタカナ', nameEn:'Katakana', nameBn:'কাতাকানা' },
+    { id:'hex-vocab',  pctId:'hpct-vocab',  mod:'vocab',   getData:()=>JLPT_V5||[],
+      nameJa:'語彙N5', nameEn:'Vocab N5', nameBn:'শব্দ N5' },
+    { id:'hex-kanji',  pctId:'hpct-kanji',  mod:'kanji',   getData:()=>JLPT_K5||[],
+      nameJa:'漢字N5', nameEn:'Kanji N5', nameBn:'কাঞ্জি N5' },
+    { id:'hex-verb',   pctId:'hpct-verb',   mod:'verb',    getData:()=>[...(VERBS||[]),...(VERBS_N4||[])],
+      nameJa:'動詞活用', nameEn:'Verbs', nameBn:'ক্রিয়া' },
+    { id:'hex-adj',    pctId:'hpct-adj',    mod:'adj',     getData:()=>[...(I_ADJ||[]),...(NA_ADJ||[])],
+      nameJa:'形容詞', nameEn:'Adjectives', nameBn:'বিশেষণ' },
+    { id:'hex-vocab4', pctId:'hpct-vocab4', mod:'vocab',   getData:()=>JLPT_V4||[],
+      nameJa:'語彙N4', nameEn:'Vocab N4', nameBn:'শব্দ N4' },
+    { id:'hex-gram',   pctId:'hpct-gram',   mod:'grammar', getData:()=>GRAM||[],
+      nameJa:'文法', nameEn:'Grammar', nameBn:'ব্যাকরণ' },
+    { id:'hex-part',   pctId:'hpct-part',   mod:'grammar', getData:()=>GRAM||[],
+      nameJa:'助詞', nameEn:'Particles', nameBn:'পার্টিকেল' },
+    { id:'hex-kanji4', pctId:'hpct-kanji4', mod:'kanji',   getData:()=>JLPT_K4||[],
+      nameJa:'漢字N4', nameEn:'Kanji N4', nameBn:'কাঞ্জি N4' },
+    { id:'hex-time',   pctId:'hpct-time',   mod:'timenum', getData:()=>[],
+      nameJa:'時間・数', nameEn:'Time/Num', nameBn:'সময়/সংখ্যা' },
+  ];
+  return mods;
+}
+
+// SRS から正答率を取得（modKey + items配列から）
+function calcModAcc(modKey, items) {
+  let c=0, w=0;
+  items.forEach(function(item){
+    const key = 'nw3_srs_' + modKey + '_' + (item[0]||item.q||item.p||'');
+    try {
+      const d = JSON.parse(localStorage.getItem(key)||'{}');
+      c += (d.c||0); w += (d.w||0);
+    } catch(e){}
+  });
+  const t = c+w;
+  return t>0 ? {pct:Math.round(c/t*100), c, w, t} : null;
+}
+
+// 全モジュールの「間違えた問題数」を取得（w > c のアイテム or w>0）
+function getAllWrongItems() {
+  const results = [];
+  const modDefs = [
+    { mod:'kana',    label:'かな',    getData:()=>[...HB,...HD,...KB,...KD] },
+    { mod:'vocab',   label:'語彙',    getData:()=>[...(JLPT_V5||[]),...(JLPT_V4||[])] },
+    { mod:'kanji',   label:'漢字',    getData:()=>[...(JLPT_K5||[]),...(JLPT_K4||[])] },
+    { mod:'verb',    label:'動詞',    getData:()=>[...(VERBS||[]),...(VERBS_N4||[])] },
+    { mod:'adj',     label:'形容詞',  getData:()=>[...(I_ADJ||[]),...(NA_ADJ||[])] },
+    { mod:'grammar', label:'文法',    getData:()=>GRAM||[] },
+    { mod:'biz',     label:'ビジネス',getData:()=>[] },
+  ];
+  modDefs.forEach(function(def){
+    let items;
+    try { items = def.getData(); } catch(e){ items=[]; }
+    items.forEach(function(item){
+      const key = 'nw3_srs_' + def.mod + '_' + (item[0]||item.q||item.p||'');
+      try {
+        const d = JSON.parse(localStorage.getItem(key)||'{}');
+        const w = d.w||0, c2 = d.c||0;
+        if(w > 0) {  // 1回でも間違えたことがある
+          results.push({ item, mod:def.mod, label:def.label, key, w, c:c2 });
+        }
+      } catch(e){}
+    });
+  });
+  return results;
+}
+
+// 制圧数をlocalStorageから取得・保存
+function getControlled() { return parseInt(localStorage.getItem('nw3_controlled')||'0'); }
+function setControlled(n) { localStorage.setItem('nw3_controlled', n); }
+
+// ── メイン：バトルマップ描画
+function renderBattleMap() {
+  const mods = getBattleData();
+  const lang = (typeof _lang !== 'undefined') ? _lang : 'ja';
+
+  mods.forEach(function(m){
+    const el = document.getElementById(m.id);
+    const pctEl = document.getElementById(m.pctId);
+    const nameEl = el ? el.querySelector('.hex-name') : null;
+
+    // 言語別の名前を更新
+    if(nameEl){
+      nameEl.textContent = lang==='en' ? m.nameEn : lang==='bn' ? m.nameBn : m.nameJa;
+    }
+
+    let items;
+    try { items = m.getData(); } catch(e){ items=[]; }
+
+    if(items.length === 0){
+      if(pctEl) pctEl.textContent = '?';
+      return;
+    }
+
+    const acc = calcModAcc(m.mod, items);
+    if(!acc){
+      if(pctEl) pctEl.textContent = '?';
+      return;
+    }
+    if(pctEl) pctEl.textContent = acc.pct + '%';
+
+    // 色更新
     if(el){
-      el.className='hex-cell '+(pct>=80?'status-green':pct>=50?'status-yellow':pct>=30?'status-red':'status-danger');
+      const base = el.className.replace(/status-\w+/,'').trim();
+      const cls = acc.pct>=80 ? 'status-green' : acc.pct>=50 ? 'status-yellow' : acc.pct>=30 ? 'status-red' : 'status-danger';
+      el.className = 'hex-cell ' + cls;
     }
   });
 
-  // Update domination ring
-  const avgPct=counted>0?Math.round(totalPct/counted):0;
-  const domText=document.getElementById('dom-pct-text');
-  const domRing=document.getElementById('dom-ring-fg');
-  if(domText)domText.textContent=avgPct+'%';
-  if(domRing){
-    const circ=188.5;
-    domRing.style.strokeDashoffset=circ-(circ*avgPct/100);
+  // 間違えた問題数 & 制圧カウンター更新
+  const wrongItems = getAllWrongItems();
+  const totalWrong = wrongItems.length;
+  const controlled = getControlled();
+
+  const enemEl = document.getElementById('dom-enemies');
+  const ctrlEl = document.getElementById('dom-controlled');
+  if(enemEl) enemEl.textContent = totalWrong;
+  if(ctrlEl) ctrlEl.textContent = controlled;
+
+  // 言語別ラベル
+  const lblMap = {
+    'lbl-enemies':    {ja:'💀 間違えた問題数', en:'💀 Wrong Answers', bn:'💀 ভুল উত্তর সংখ্যা'},
+    'lbl-wrong-sub':  {ja:'問題', en:'questions', bn:'প্রশ্ন'},
+    'lbl-controlled': {ja:'⚔ 制圧', en:'⚔ Conquered', bn:'⚔ জয়'},
+    'lbl-ctrl-sub':   {ja:'問制圧済', en:'conquered', bn:'জয় করা'},
+    'attack-btn-label':{ja:'間違えた問題を攻略開始', en:'Start Wrong Answer Quiz', bn:'ভুল প্রশ্নের কুইজ শুরু'},
+    'samurai-speech': {
+      ja:['諦めるな、武士！','弱点を制圧せよ！','今日も修行だ！','敵を倒せ！'],
+      en:['Never give up!','Conquer your weaknesses!','Train hard today!','Defeat the enemy!'],
+      bn:['হাল ছেড়ো না!','দুর্বলতা জয় করো!','আজও অনুশীলন করো!','শত্রু পরাজিত করো!']
+    }
+  };
+
+  Object.keys(lblMap).forEach(function(id){
+    const el2 = document.getElementById(id);
+    if(!el2) return;
+    const v = lblMap[id];
+    if(Array.isArray(v[lang])){
+      // random speech
+      const arr = v[lang]||v['ja'];
+      el2.textContent = arr[Math.floor(Math.random()*arr.length)];
+    } else {
+      el2.textContent = v[lang]||v['ja'];
+    }
+  });
+
+  // 凡例の言語
+  const legendMap = {
+    'leg-red':    {ja:'敵支配', en:'Enemy', bn:'শত্রু'},
+    'leg-yellow': {ja:'交戦中', en:'Fighting', bn:'লড়াই'},
+    'leg-green':  {ja:'制圧済', en:'Conquered', bn:'জয়'},
+    'leg-dark':   {ja:'霧の戦場', en:'Unknown', bn:'অজানা'},
+  };
+  Object.keys(legendMap).forEach(function(id){
+    const el3 = document.getElementById(id);
+    if(el3) el3.textContent = (legendMap[id][lang]||legendMap[id]['ja']);
+  });
+}
+
+// ── 「間違えた問題を攻略開始」クイズ機能
+function startWrongQuiz() {
+  const wrongItems = getAllWrongItems();
+  if(wrongItems.length === 0){
+    const lang = (typeof _lang !== 'undefined') ? _lang : 'ja';
+    const msg = {ja:'間違えた問題がありません！すごい！', en:'No wrong answers! Amazing!', bn:'কোনো ভুল নেই! অসাধারণ!'};
+    alert(msg[lang]||msg['ja']);
+    return;
   }
 
-  // Update counters
-  const enemEl=document.getElementById('dom-enemies');
-  const ctrlEl=document.getElementById('dom-controlled');
-  if(enemEl)enemEl.textContent=weakTotal||'0';
-  // Today's quiz count
-  const todayKey='nw3_today_'+new Date().toISOString().slice(0,10);
-  const todayCt=parseInt(localStorage.getItem(todayKey)||'0');
-  const todayEl=document.getElementById('dom-today');
-  if(todayEl)todayEl.textContent=todayCt;
+  // 10問ランダムに選出
+  const shuffled = wrongItems.slice().sort(()=>Math.random()-0.5);
+  const selected = shuffled.slice(0, 10);
 
-  // Controlled = modules with >80%
-  const controlled=hexMap.filter(function(h){const p=getAcc(h.key);return p!==null&&p>=80;}).length;
-  if(ctrlEl)ctrlEl.textContent=controlled;
+  const overlay = document.getElementById('wrong-quiz-overlay');
+  const inner = document.getElementById('wrong-quiz-inner');
+  overlay.style.display = 'block';
+  document.body.style.overflow = 'hidden';
 
-  // Samurai speech
-  const speeches=['敵陣を突破せよ！','諦めるな、武士！','今日も修行だ！','弱点を制圧せよ！'];
-  const sp=document.getElementById('samurai-speech');
-  if(sp)sp.textContent=speeches[Math.floor(Math.random()*speeches.length)];
+  runWrongQuiz(selected, inner, overlay);
+}
+
+function runWrongQuiz(questions, container, overlay) {
+  const lang = (typeof _lang !== 'undefined') ? _lang : 'ja';
+  let currentIdx = 0;
+  let results = []; // {item, mod, correct: bool}
+  const total = questions.length;
+
+  function shuf(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+
+  function getQuestion(q) {
+    // q = { item, mod, label, key, w, c }
+    const item = q.item;
+    const mod = q.mod;
+    // Build question: show word/kanji, ask meaning
+    let question = '', answer = '', opts = [];
+
+    if(mod === 'kana') {
+      // item: [char, romaji, ...]
+      question = item[0]||'';
+      answer = item[1]||'';
+      // generate distractors from kana pool
+      const pool = [...HB,...HD,...KB,...KD];
+      const wrongs = shuf(pool.filter(x=>x[1]!==answer)).slice(0,3).map(x=>x[1]);
+      opts = shuf([answer, ...wrongs]);
+    } else if(mod === 'vocab') {
+      question = item[0]||item.q||'';
+      answer = item[1]||item.a||'';
+      const pool = [...(JLPT_V5||[]),...(JLPT_V4||[])];
+      const wrongs = shuf(pool.filter(x=>(x[1]||x.a)!==answer&&(x[0]||x.q)!==question)).slice(0,3).map(x=>x[1]||x.a);
+      opts = shuf([answer, ...wrongs]);
+    } else if(mod === 'kanji') {
+      question = item[0]||item.q||'';
+      answer = item[1]||item.a||'';
+      const pool = [...(JLPT_K5||[]),...(JLPT_K4||[])];
+      const wrongs = shuf(pool.filter(x=>(x[1]||x.a)!==answer&&(x[0]||x.q)!==question)).slice(0,3).map(x=>x[1]||x.a);
+      opts = shuf([answer, ...wrongs]);
+    } else if(mod === 'verb') {
+      question = item[0]||'';
+      answer = item[1]||'';
+      const pool = [...(VERBS||[]),...(VERBS_N4||[])];
+      const wrongs = shuf(pool.filter(x=>x[1]!==answer)).slice(0,3).map(x=>x[1]);
+      opts = shuf([answer, ...wrongs]);
+    } else if(mod === 'adj') {
+      question = item[0]||'';
+      answer = item[1]||'';
+      const pool = [...(I_ADJ||[]),...(NA_ADJ||[])];
+      const wrongs = shuf(pool.filter(x=>x[1]!==answer)).slice(0,3).map(x=>x[1]);
+      opts = shuf([answer, ...wrongs]);
+    } else if(mod === 'grammar') {
+      question = item.p||item[0]||'';
+      answer = item.m||item.a||item[1]||'';
+      const pool = GRAM||[];
+      const wrongs = shuf(pool.filter(x=>(x.m||x.a)!==answer)).slice(0,3).map(x=>x.m||x.a||'');
+      opts = shuf([answer, ...wrongs]);
+    } else {
+      question = item[0]||item.q||'';
+      answer = item[1]||item.a||'';
+      opts = [answer];
+    }
+
+    return { question, answer, opts, mod, label: q.label };
+  }
+
+  function renderQuestion() {
+    const q = questions[currentIdx];
+    const qData = getQuestion(q);
+    const progressPct = Math.round((currentIdx/total)*100);
+
+    const btnsHTML = qData.opts.map(opt =>
+      `<button onclick="handleWrongAns(this,'${opt.replace(/'/g,"\\'")}','${qData.answer.replace(/'/g,"\\'")}',${currentIdx})"
+        style="width:100%;padding:14px 16px;margin:4px 0;background:rgba(30,20,8,0.9);border:1px solid rgba(200,150,60,0.2);
+        color:#e8d5b0;font-size:14px;font-family:inherit;cursor:pointer;border-radius:4px;text-align:left;
+        transition:all 0.15s" onmouseover="this.style.borderColor='rgba(200,150,60,0.6)'" onmouseout="if(!this.dataset.answered)this.style.borderColor='rgba(200,150,60,0.2)'">${opt}</button>`
+    ).join('');
+
+    container.innerHTML = `
+      <div style="padding:16px 0">
+        <!-- Close -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-size:11px;color:#a89070">${currentIdx+1} / ${total}</div>
+          <button onclick="closeWrongQuiz()" style="background:none;border:1px solid rgba(200,150,60,0.3);color:#a89070;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px">✕ 閉じる</button>
+        </div>
+        <!-- Progress bar -->
+        <div style="background:rgba(255,255,255,0.08);height:4px;border-radius:2px;margin-bottom:20px;overflow:hidden">
+          <div style="background:linear-gradient(90deg,#c0392b,#c8960a);height:100%;width:${progressPct}%;transition:width 0.3s"></div>
+        </div>
+        <!-- Category badge -->
+        <div style="font-size:10px;color:#c8960a;background:rgba(200,150,10,0.1);border:1px solid rgba(200,150,10,0.3);
+          display:inline-block;padding:2px 10px;border-radius:3px;margin-bottom:12px">${qData.label}</div>
+        <!-- Question -->
+        <div style="background:linear-gradient(160deg,#1a1208,#120d04);border:1px solid rgba(200,150,60,0.2);
+          border-radius:4px;padding:28px;text-align:center;margin-bottom:14px;position:relative">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#c0392b,#c8960a)"></div>
+          <div style="font-family:'Zen Maru Gothic',sans-serif;font-size:52px;font-weight:900;color:#e8d5b0;
+            text-shadow:0 0 30px rgba(192,57,43,0.2);line-height:1.2">${qData.question}</div>
+          <div style="font-size:11px;color:#6b5840;margin-top:8px">${{ja:'意味は？',en:'What does this mean?',bn:'এর অর্থ কী?'}[lang]||'意味は？'}</div>
+        </div>
+        <!-- Options -->
+        <div id="wq-opts">${btnsHTML}</div>
+        <div id="wq-feedback" style="display:none;padding:12px 16px;border-radius:4px;margin-top:8px;font-size:13px;line-height:1.7"></div>
+        <div id="wq-next" style="display:none;margin-top:12px">
+          <button onclick="nextWrongQ()" style="width:100%;padding:12px;background:linear-gradient(135deg,#b02a1e,#8b1a10);
+            color:#f5d5c0;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+            ${currentIdx<total-1 ? {ja:'次の問題 →',en:'Next →',bn:'পরবর্তী →'}[lang]||'次の問題 →' : {ja:'結果を見る',en:'See Results',bn:'ফলাফল দেখুন'}[lang]||'結果を見る'}
+          </button>
+        </div>
+      </div>`;
+  }
+
+  window.handleWrongAns = function(btn, chosen, answer, idx) {
+    // Disable all buttons
+    const opts = document.querySelectorAll('#wq-opts button');
+    opts.forEach(b => {
+      b.dataset.answered = '1';
+      b.style.cursor = 'default';
+      b.onmouseover = null; b.onmouseout = null;
+    });
+
+    const isOk = chosen === answer;
+    results[idx] = { q: questions[idx], correct: isOk };
+
+    // Color buttons
+    opts.forEach(b => {
+      const bText = b.textContent.trim();
+      if(bText === answer) { b.style.background='rgba(74,140,74,0.25)'; b.style.borderColor='rgba(74,140,74,0.7)'; b.style.color='#7dd87d'; }
+      else if(bText === chosen && !isOk) { b.style.background='rgba(192,57,43,0.2)'; b.style.borderColor='rgba(192,57,43,0.5)'; b.style.color='#e07070'; }
+    });
+
+    // Feedback
+    const fb = document.getElementById('wq-feedback');
+    fb.style.display = 'block';
+    if(isOk){
+      fb.style.background = 'rgba(74,140,74,0.1)';
+      fb.style.border = '1px solid rgba(74,140,74,0.3)';
+      fb.style.color = '#7dd87d';
+      fb.innerHTML = '✓ ' + ({ja:'正解！',en:'Correct!',bn:'সঠিক!'}[lang]||'正解！');
+    } else {
+      fb.style.background = 'rgba(192,57,43,0.1)';
+      fb.style.border = '1px solid rgba(192,57,43,0.3)';
+      fb.style.color = '#e07070';
+      fb.innerHTML = '✗ ' + ({ja:'不正解。正解: ',en:'Wrong. Answer: ',bn:'ভুল। সঠিক: '}[lang]||'不正解。正解: ') + '<b>' + answer + '</b>';
+    }
+
+    document.getElementById('wq-next').style.display = 'block';
+  };
+
+  window.nextWrongQ = function() {
+    currentIdx++;
+    if(currentIdx >= total) {
+      showWrongResults();
+    } else {
+      renderQuestion();
+    }
+  };
+
+  window.closeWrongQuiz = function() {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    renderBattleMap();
+  };
+
+  function showWrongResults() {
+    const correctCount = results.filter(r=>r&&r.correct).length;
+    const wrongCount = results.filter(r=>r&&!r.correct).length;
+    const pct = Math.round(correctCount/total*100);
+
+    // Update SRS: correct ones remove wrong flag, wrong ones keep
+    results.forEach(function(r){
+      if(!r) return;
+      const q = r.q;
+      const srsKey = q.key;
+      try {
+        const d = JSON.parse(localStorage.getItem(srsKey)||'{}');
+        if(r.correct){
+          // 正解: correct++, 制圧カウント加算
+          d.c = (d.c||0)+1;
+          localStorage.setItem(srsKey, JSON.stringify(d));
+          setControlled(getControlled()+1);
+          // グローバルカウンタ更新
+          try{ addS(); }catch(e){}
+        } else {
+          // 不正解: wrong++ 
+          d.w = (d.w||0)+1;
+          localStorage.setItem(srsKey, JSON.stringify(d));
+          try{ if(typeof rstS==='function')rstS(); }catch(e){}
+        }
+      } catch(e){}
+    });
+
+    // Wrong items for display
+    const wrongList = results.filter(r=>r&&!r.correct).map(r=>{
+      const item = r.q.item;
+      return (item[0]||item.q||'') + ' → ' + (item[1]||item.a||'');
+    });
+
+    const emoji = pct>=90?'🏆':pct>=70?'⚔':pct>=50?'💪':'📚';
+    const msg = {
+      ja: pct>=90?'完璧！':pct>=70?'よくできました！':pct>=50?'頑張りました！':'もっと練習しよう！',
+      en: pct>=90?'Perfect!':pct>=70?'Well done!':pct>=50?'Good effort!':'Keep practicing!',
+      bn: pct>=90?'নিখুঁত!':pct>=70?'ভালো করেছ!':pct>=50?'চেষ্টা ভালো!':'অনুশীলন চালিয়ে যাও!'
+    }[lang]||'';
+
+    const wrongListHTML = wrongList.length > 0 ?
+      `<div style="margin-top:16px;padding:12px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.25);border-radius:4px">
+        <div style="font-size:11px;color:#a89070;margin-bottom:8px">${{ja:'まだ間違えた問題',en:'Still wrong',bn:'এখনও ভুল'}[lang]||'まだ間違えた問題'}:</div>
+        ${wrongList.map(w=>`<div style="font-size:13px;color:#e07070;padding:3px 0;border-bottom:1px solid rgba(192,57,43,0.15)">${w}</div>`).join('')}
+      </div>` : '';
+
+    container.innerHTML = `
+      <div style="padding:16px 0;text-align:center">
+        <div style="font-size:60px;margin-bottom:8px">${emoji}</div>
+        <div style="font-family:'Zen Maru Gothic',sans-serif;font-size:64px;font-weight:900;
+          background:linear-gradient(135deg,#c0392b,#c8960a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">${pct}%</div>
+        <div style="font-size:16px;color:#a89070;margin:8px 0 24px">${msg}</div>
+
+        <div style="display:flex;gap:12px;justify-content:center;margin-bottom:20px">
+          <div style="background:rgba(74,140,74,0.12);border:1px solid rgba(74,140,74,0.3);border-radius:4px;padding:14px 24px">
+            <div style="font-size:10px;color:#a89070;margin-bottom:4px">${{ja:'正解',en:'Correct',bn:'সঠিক'}[lang]||'正解'}</div>
+            <div style="font-size:28px;font-weight:900;color:#7dd87d">${correctCount}</div>
+          </div>
+          <div style="background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);border-radius:4px;padding:14px 24px">
+            <div style="font-size:10px;color:#a89070;margin-bottom:4px">${{ja:'不正解',en:'Wrong',bn:'ভুল'}[lang]||'不正解'}</div>
+            <div style="font-size:28px;font-weight:900;color:#e07070">${wrongCount}</div>
+          </div>
+        </div>
+
+        ${wrongListHTML}
+
+        <div style="display:flex;gap:8px;margin-top:20px">
+          <button onclick="closeWrongQuiz()" style="flex:1;padding:14px;background:rgba(30,20,8,0.9);border:1px solid rgba(200,150,60,0.3);
+            color:#e8d5b0;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+            ${lang==='en'?'Back to Map':lang==='bn'?'ম্যাপে ফিরুন':'マップに戻る'}
+          </button>
+          <button onclick="startWrongQuiz()" style="flex:1;padding:14px;background:linear-gradient(135deg,#b02a1e,#8b1a10);
+            color:#f5d5c0;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+            ${lang==='en'?'Try Again':lang==='bn'?'আবার চেষ্টা':'もう一度'}
+          </button>
+        </div>
+      </div>`;
+  }
+
+  renderQuestion();
+}
+
+// ── setLang フック: 言語切替後にバトルマップ再描画
+// head内のsetLangはリロードするが、念のためフック
+(function(){
+  const _orig = window.setLang;
+  if(typeof _orig === 'function'){
+    window.setLang = function(l){
+      _orig(l);
+      setTimeout(function(){ if(typeof renderBattleMap==='function') renderBattleMap(); }, 200);
+    };
+  }
 })();
+
+// ── 初期化（DOMContentLoaded 後）
+document.addEventListener('DOMContentLoaded', function(){
+  renderBattleMap();
+});
+// Fallback for if DOMContentLoaded already fired
+if(document.readyState !== 'loading') {
+  setTimeout(renderBattleMap, 0);
+}
 </script>
 </body>
 </html>
