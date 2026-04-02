@@ -954,7 +954,7 @@ function getBattleData() {
       nameJa:'助詞', nameEn:'Particles', nameBn:'পার্টিকেল' },
     { id:'hex-kanji4', pctId:'hpct-kanji4', mod:'kanji',   getData:()=>JLPT_K4||[],
       nameJa:'漢字N4', nameEn:'Kanji N4', nameBn:'কাঞ্জি N4' },
-    { id:'hex-time',   pctId:'hpct-time',   mod:'timenum', getData:()=>[],
+    { id:'hex-time',   pctId:'hpct-time',   mod:'timenum', getData:()=>{try{const h=(typeof HOURS!=='undefined'?HOURS:[]).map(h=>({q:h[2],a:h[1]}));const m=(typeof MINS!=='undefined'?MINS:[]).map(m=>({q:m[2],a:m[1]}));return[...h,...m]}catch(e){return[]}},
       nameJa:'時間・数', nameEn:'Time/Num', nameBn:'সময়/সংখ্যা' },
   ];
   return mods;
@@ -974,7 +974,7 @@ function calcModAcc(modKey, items) {
   return t>0 ? {pct:Math.round(c/t*100), c, w, t} : null;
 }
 
-// 全モジュールの「間違えた問題数」を取得（w > c のアイテム or w>0）
+// 全モジュールの「間違えた問題数」を取得（w > c のアイテム = 苦手なアイテム）
 function getAllWrongItems() {
   const results = [];
   const modDefs = [
@@ -984,6 +984,7 @@ function getAllWrongItems() {
     { mod:'verb',    label:'動詞',    getData:()=>[...(VERBS||[]),...(VERBS_N4||[])] },
     { mod:'adj',     label:'形容詞',  getData:()=>[...(I_ADJ||[]),...(NA_ADJ||[])] },
     { mod:'grammar', label:'文法',    getData:()=>GRAM||[] },
+    { mod:'timenum', label:'時間・数',getData:()=>{try{const h=(typeof HOURS!=='undefined'?HOURS:[]).map(h=>({q:h[2],a:h[1]}));const m=(typeof MINS!=='undefined'?MINS:[]).map(m=>({q:m[2],a:m[1]}));return[...h,...m]}catch(e){return[]}} },
     { mod:'biz',     label:'ビジネス',getData:()=>[] },
   ];
   modDefs.forEach(function(def){
@@ -994,7 +995,7 @@ function getAllWrongItems() {
       try {
         const d = JSON.parse(localStorage.getItem(key)||'{}');
         const w = d.w||0, c2 = d.c||0;
-        if(w > 0) {  // 1回でも間違えたことがある
+        if(w > 0 && w >= c2) {  // 苦手 = 間違い回数が正解以上
           results.push({ item, mod:def.mod, label:def.label, key, w, c:c2 });
         }
       } catch(e){}
@@ -1003,9 +1004,33 @@ function getAllWrongItems() {
   return results;
 }
 
-// 制圧数をlocalStorageから取得・保存
-function getControlled() { return parseInt(localStorage.getItem('nw3_controlled')||'0'); }
-function setControlled(n) { localStorage.setItem('nw3_controlled', n); }
+// 制圧数をSRSデータから動的に計算（c>=3 且つ c>w*2 のアイテム数）
+function getControlled() {
+  let count = 0;
+  const modDefs = [
+    { mod:'kana',    getData:()=>[...HB,...HD,...KB,...KD] },
+    { mod:'vocab',   getData:()=>[...(JLPT_V5||[]),...(JLPT_V4||[])] },
+    { mod:'kanji',   getData:()=>[...(JLPT_K5||[]),...(JLPT_K4||[])] },
+    { mod:'verb',    getData:()=>[...(VERBS||[]),...(VERBS_N4||[])] },
+    { mod:'adj',     getData:()=>[...(I_ADJ||[]),...(NA_ADJ||[])] },
+    { mod:'grammar', getData:()=>GRAM||[] },
+    { mod:'timenum', getData:()=>{try{const h=(typeof HOURS!=='undefined'?HOURS:[]).map(h=>({q:h[2],a:h[1]}));const m=(typeof MINS!=='undefined'?MINS:[]).map(m=>({q:m[2],a:m[1]}));return[...h,...m]}catch(e){return[]}} },
+  ];
+  modDefs.forEach(function(def){
+    let items;
+    try { items = def.getData(); } catch(e){ items=[]; }
+    items.forEach(function(item){
+      const key = 'nw3_srs_' + def.mod + '_' + (item[0]||item.q||item.p||'');
+      try {
+        const d = JSON.parse(localStorage.getItem(key)||'{}');
+        const w = d.w||0, c2 = d.c||0;
+        if(c2 >= 3 && c2 > w * 2) count++;
+      } catch(e){}
+    });
+  });
+  return count;
+}
+// setControlled is no longer needed - computed dynamically from SRS
 
 // ── メイン：バトルマップ描画
 function renderBattleMap() {
