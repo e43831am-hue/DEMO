@@ -773,87 +773,87 @@ function setLang(l){
     <div class="hex-grid" id="hex-map">
       <!-- Row 1: top 4 modules (high mastery = green) -->
       <div class="hex-row">
-        <a class="hex-cell status-green" href="kana-practice.html" id="hex-kana">
+        <a class="hex-cell status-danger" href="kana-practice.html" id="hex-kana">
           <div class="hex-inner">
             <div class="hex-icon">あ</div>
             <div class="hex-name">ひらがな</div>
-            <div class="hex-pct" id="hpct-kana">--</div>
+            <div class="hex-pct" id="hpct-kana">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-green" href="kana-practice.html#kata" id="hex-kata">
+        <a class="hex-cell status-danger" href="kana-practice.html#kata" id="hex-kata">
           <div class="hex-inner">
             <div class="hex-icon">ア</div>
             <div class="hex-name">カタカナ</div>
-            <div class="hex-pct" id="hpct-kata">--</div>
+            <div class="hex-pct" id="hpct-kata">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-yellow" href="vocab.html" id="hex-vocab">
+        <a class="hex-cell status-danger" href="vocab.html" id="hex-vocab">
           <div class="hex-inner">
             <div class="hex-icon">📖</div>
             <div class="hex-name">語彙N5</div>
-            <div class="hex-pct" id="hpct-vocab">--</div>
+            <div class="hex-pct" id="hpct-vocab">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-yellow" href="kanji.html" id="hex-kanji">
+        <a class="hex-cell status-danger" href="kanji.html" id="hex-kanji">
           <div class="hex-inner">
             <div class="hex-icon">漢</div>
             <div class="hex-name">漢字N5</div>
-            <div class="hex-pct" id="hpct-kanji">--</div>
+            <div class="hex-pct" id="hpct-kanji">0%</div>
           </div>
         </a>
       </div>
       <!-- Row 2: mid level -->
       <div class="hex-row">
-        <a class="hex-cell status-yellow" href="verb.html" id="hex-verb">
+        <a class="hex-cell status-danger" href="verb.html" id="hex-verb">
           <div class="hex-inner">
             <div class="hex-icon">🔄</div>
             <div class="hex-name">動詞活用</div>
-            <div class="hex-pct" id="hpct-verb">--</div>
+            <div class="hex-pct" id="hpct-verb">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-yellow" href="adj.html" id="hex-adj">
+        <a class="hex-cell status-danger" href="adj.html" id="hex-adj">
           <div class="hex-inner">
             <div class="hex-icon">📝</div>
             <div class="hex-name">形容詞</div>
-            <div class="hex-pct" id="hpct-adj">--</div>
+            <div class="hex-pct" id="hpct-adj">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-red" href="vocab.html#n4" id="hex-vocab4">
+        <a class="hex-cell status-danger" href="vocab.html#n4" id="hex-vocab4">
           <div class="hex-inner">
             <div class="hex-icon">📖</div>
             <div class="hex-name">語彙N4</div>
-            <div class="hex-pct" id="hpct-vocab4">--</div>
+            <div class="hex-pct" id="hpct-vocab4">0%</div>
           </div>
         </a>
       </div>
       <!-- Row 3: harder modules -->
       <div class="hex-row">
-        <a class="hex-cell status-red" href="grammar.html" id="hex-gram">
+        <a class="hex-cell status-danger" href="grammar.html" id="hex-gram">
           <div class="hex-inner">
             <div class="hex-icon">📗</div>
             <div class="hex-name">文法</div>
-            <div class="hex-pct" id="hpct-gram">--</div>
+            <div class="hex-pct" id="hpct-gram">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-red" href="grammar.html#particles" id="hex-part">
+        <a class="hex-cell status-danger" href="grammar.html#particles" id="hex-part">
           <div class="hex-inner">
             <div class="hex-icon">abc</div>
             <div class="hex-name">助詞</div>
-            <div class="hex-pct" id="hpct-part">--</div>
+            <div class="hex-pct" id="hpct-part">0%</div>
           </div>
         </a>
         <a class="hex-cell status-danger" href="kanji.html#n4" id="hex-kanji4">
           <div class="hex-inner">
             <div class="hex-icon">漢</div>
             <div class="hex-name">漢字N4</div>
-            <div class="hex-pct" id="hpct-kanji4">--</div>
+            <div class="hex-pct" id="hpct-kanji4">0%</div>
           </div>
         </a>
-        <a class="hex-cell status-dark" href="timenum.html" id="hex-time">
+        <a class="hex-cell status-danger" href="timenum.html" id="hex-time">
           <div class="hex-inner">
             <div class="hex-icon">🕐</div>
             <div class="hex-name">時間・数</div>
-            <div class="hex-pct" id="hpct-time">?</div>
+            <div class="hex-pct" id="hpct-time">0%</div>
           </div>
         </a>
       </div>
@@ -1026,21 +1026,23 @@ function renderBattleMap() {
     try { items = m.getData(); } catch(e){ items=[]; }
 
     if(items.length === 0){
-      if(pctEl) pctEl.textContent = '?';
+      if(pctEl) pctEl.textContent = '0%';
+      if(el) el.className = 'hex-cell status-danger';
       return;
     }
 
     const acc = calcModAcc(m.mod, items);
     if(!acc){
-      if(pctEl) pctEl.textContent = '?';
+      // 未回答 = 0%・真っ赤
+      if(pctEl) pctEl.textContent = '0%';
+      if(el) el.className = 'hex-cell status-danger';
       return;
     }
     if(pctEl) pctEl.textContent = acc.pct + '%';
 
-    // 色更新
+    // 色更新: 0%=danger(赤), 1-49%=red, 50-79%=yellow, 80%+=green
     if(el){
-      const base = el.className.replace(/status-\w+/,'').trim();
-      const cls = acc.pct>=80 ? 'status-green' : acc.pct>=50 ? 'status-yellow' : acc.pct>=30 ? 'status-red' : 'status-danger';
+      const cls = acc.pct>=80 ? 'status-green' : acc.pct>=50 ? 'status-yellow' : acc.pct>0 ? 'status-red' : 'status-danger';
       el.className = 'hex-cell ' + cls;
     }
   });
